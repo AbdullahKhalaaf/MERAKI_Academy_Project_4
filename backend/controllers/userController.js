@@ -15,11 +15,18 @@ const userRegister = (req, res) => {
   newUser
     .save()
     .then((result) => {
-      console.log(result);
-      res.send(result);
+      res.status(201).json({
+        success: true,
+        message: "Account Created Successfully",
+        author: result,
+      });
     })
     .catch((err) => {
       console.log(err);
+      res.status(409).json({
+        success: false,
+        message: "The email already exists",
+      });
     });
 };
 
