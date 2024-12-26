@@ -11,6 +11,9 @@ app.use(express.json());
 const userRouter = require("./routes/userRouter")
 app.use("/users", userRouter);
 
+const roleRouter = require("./routes/roleRouter")
+app.use("/roles", roleRouter);
+
 
 // Handles any other endpoints [unassigned - endpoints]
 app.use("*", (req, res) => res.status(404).json("NO content at this path"));

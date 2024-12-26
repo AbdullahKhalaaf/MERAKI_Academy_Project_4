@@ -14,11 +14,15 @@ const userSchema = new mongoose.Schema({
       "https://icons.veryicon.com/png/o/miscellaneous/rookie-official-icon-gallery/225-default-avatar.png",
   },
 });
-
 userSchema.pre("save", async function () {
   this.email = this.email.toLowerCase();
-  this.password = await bcrypt.hash(this.password, 8);
+
+  const salt = 10;
+  const hashedPassword = await bcrypt.hash(this.password, salt);
+  this.password = hashedPassword;
 });
+
+
 
 const userModel = mongoose.model("User", userSchema);
 module.exports = userModel;
