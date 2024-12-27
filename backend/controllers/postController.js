@@ -1,4 +1,4 @@
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 const postModel = require("../models/postSchema");
 
 const createPost = (req, res) => {
@@ -60,4 +60,34 @@ const getAllPosts = (req, res) => {
     });
 };
 
-module.exports = { createPost, getAllPosts };
+const deletePostById = (req, res) => {
+  const postId = req.params.id;
+  //   console.log(req.token.id);
+  // should make statment between the token and the author if matched he can delete
+  // but till now i don't know ho to reach it :( )
+  postModel
+    .findByIdAndDelete(postId)
+    .then((result) => {
+      if (!result) {
+        return res.status(500).json({
+          success: false,
+          message: `The post with ID ${postId} was not found `,
+          error: err.message,
+        });
+      }
+      return res.status(200).json({
+        success: true,
+        message: "The post deleted successfully",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({
+        success: false,
+        message: "Server Error",
+        err: err.message,
+      });
+    });
+};
+
+module.exports = { createPost, getAllPosts, deletePostById };
