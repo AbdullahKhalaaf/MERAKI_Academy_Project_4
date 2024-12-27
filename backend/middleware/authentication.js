@@ -20,6 +20,8 @@ const authentication = (req, res, next) => {
         });
       }
       req.token = result;
+      
+
       next();
     });
   } catch (err) {

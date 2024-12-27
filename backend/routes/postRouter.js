@@ -9,5 +9,5 @@ const authentication = require("../middleware/authentication");
 
 postRouter.use("/create", authentication, createPost);
 postRouter.get("/", getAllPosts);
-postRouter.delete("/:id", deletePostById);
+postRouter.delete("/:id", authentication, deletePostById);
 module.exports = postRouter;

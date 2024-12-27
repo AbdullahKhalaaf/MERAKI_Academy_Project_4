@@ -61,33 +61,47 @@ const getAllPosts = (req, res) => {
 };
 
 const deletePostById = (req, res) => {
-  const postId = req.params.id;
-  //   console.log(req.token.id);
-  // should make statment between the token and the author if matched he can delete
-  // but till now i don't know ho to reach it :( )
-  postModel
-    .findByIdAndDelete(postId)
-    .then((result) => {
-      if (!result) {
-        return res.status(500).json({
+    const postId = req.params.id;
+    console.log("Token User ID:", req.token.userId);
+  
+    postModel
+      .findById(postId)
+      .then((result) => {
+        console.log("Post Found:", result);
+  
+        if (!result) {
+          return res.status(500).json({
+            success: false,
+            message: `The post with ID ${postId} was not found.`,
+          });
+        }
+  
+        if (req.token.userId !== result.author.toString()) {
+          return res.status(403).json({
+            success: false,
+            message: "You are not authorized to delete this post.",
+          });
+        }
+  
+        return postModel.findByIdAndDelete(postId);
+      })
+      .then((deletedPost) => {
+        if (deletedPost) {
+          return res.status(200).json({
+            success: true,
+            message: "The post deleted successfully",
+          });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).json({
           success: false,
-          message: `The post with ID ${postId} was not found `,
+          message: "Server Error",
           error: err.message,
         });
-      }
-      return res.status(200).json({
-        success: true,
-        message: "The post deleted successfully",
       });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json({
-        success: false,
-        message: "Server Error",
-        err: err.message,
-      });
-    });
-};
+  };
+  
 
 module.exports = { createPost, getAllPosts, deletePostById };
