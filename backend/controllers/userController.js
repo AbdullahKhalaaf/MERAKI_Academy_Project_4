@@ -98,4 +98,25 @@ const userLogin = (req, res) => {
     });
 };
 
-module.exports = { userRegister, userLogin };
+const getAllUsers = (req, res) => {
+  userModel
+    .find({})
+    .populate("followers")
+    .populate("following")
+    .then((result) => {
+      res.status(200).json({
+        success: true,
+        message: "Users retrieved successfully.",
+        result,
+      });
+    })
+    .catch((err) => {
+      res.status(500).json({
+        success: false,
+        message: "Server error",
+        error: err.message,
+      });
+    });
+};
+
+module.exports = { userRegister, userLogin, getAllUsers };
