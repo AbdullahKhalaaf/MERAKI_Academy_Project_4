@@ -10,10 +10,22 @@ const createNewComment = (req, res) => {
   newComment
     .save()
     .then((result) => {
-      console.log(result);
+      res.status(201).json({
+        success: true,
+        message: "comment added",
+        comment: {
+          content: result.content,
+          author: result.author,
+        },
+      });
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
+      res.status(409).json({
+        success: false,
+        message: "Server Error",
+        error: err.message,
+      });
     });
 };
 
