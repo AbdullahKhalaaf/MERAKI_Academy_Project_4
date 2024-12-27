@@ -17,6 +17,9 @@ app.use("/roles", roleRouter);
 const postRouter = require("./routes/postRouter");
 app.use("/posts", postRouter);
 
+const commentRouter = require("./routes/commentRouter")
+app.use("/comments",commentRouter)
+
 // Handles any other endpoints [unassigned - endpoints]
 app.use("*", (req, res) => res.status(404).json("NO content at this path"));
 
