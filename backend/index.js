@@ -8,12 +8,14 @@ const db = require("./models/db");
 app.use(cors());
 app.use(express.json());
 
-const userRouter = require("./routes/userRouter")
+const userRouter = require("./routes/userRouter");
 app.use("/users", userRouter);
 
-const roleRouter = require("./routes/roleRouter")
+const roleRouter = require("./routes/roleRouter");
 app.use("/roles", roleRouter);
 
+const postRouter = require("./routes/postRouter");
+app.use("/posts", postRouter);
 
 // Handles any other endpoints [unassigned - endpoints]
 app.use("*", (req, res) => res.status(404).json("NO content at this path"));

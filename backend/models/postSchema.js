@@ -6,5 +6,5 @@ const postSchema = new mongoose.Schema({
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Like" }],
 });
-
-module.exports = mongoose.model("Post", postSchema);
+const postModel = mongoose.model("Post", postSchema);
+module.exports = postModel;
