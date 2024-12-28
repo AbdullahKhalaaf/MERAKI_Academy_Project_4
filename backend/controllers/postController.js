@@ -61,47 +61,35 @@ const getAllPosts = (req, res) => {
 };
 
 const deletePostById = (req, res) => {
-    const postId = req.params.id;
-    console.log("Token User ID:", req.token.userId);
-  
-    postModel
-      .findById(postId)
-      .then((result) => {
-        console.log("Post Found:", result);
-  
-        if (!result) {
-          return res.status(500).json({
-            success: false,
-            message: `The post with ID ${postId} was not found.`,
-          });
-        }
-  
-        if (req.token.userId !== result.author.toString()) {
-          return res.status(403).json({
-            success: false,
-            message: "You are not authorized to delete this post.",
-          });
-        }
-  
-        return postModel.findByIdAndDelete(postId);
-      })
-      .then((deletedPost) => {
-        if (deletedPost) {
-          return res.status(200).json({
-            success: true,
-            message: "The post deleted successfully",
-          });
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        res.status(500).json({
+  const postId = req.params.id;
+
+  postModel
+    .findByIdAndDelete(postId)
+    .then((result) => {
+      if (!result) {
+        return res.status(500).json({
           success: false,
-          message: "Server Error",
-          error: err.message,
+          message: `The Post with ID ${postId} was not found.`,
         });
+      }
+      //   if (req.token.userId !== result.commenter.toString()) {
+      //     return res.status(403).json({
+      //       success: false,
+      //       message: "You are not authorized to delete this Comment.",
+      //     });
+      //   }
+      return res.status(200).json({
+        success: true,
+        message: "The Post deleted successfully",
       });
-  };
-  
+    })
+    .catch((err) => {
+      res.status(500).json({
+        success: false,
+        message: "Server Error",
+        error: err.message,
+      });
+    });
+};
 
 module.exports = { createPost, getAllPosts, deletePostById };
