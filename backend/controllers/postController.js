@@ -137,4 +137,39 @@ const getPostById = (req, res) => {
     });
 };
 
-module.exports = { createPost, getAllPosts, deletePostById, getPostById };
+const updatePostById = (req, res) => {
+  const postId = req.params.id;
+
+  const { content } = req.body;
+  postModel
+    .findByIdAndUpdate(postId, { content: content }, { new: true })
+    .then((result) => {
+      if (!result) {
+        return res.status(404).json({
+          success: false,
+          message: "Post Not Found",
+        });
+      }
+      res.status(201).json({
+        success: true,
+        message: "Post Updated Successfully",
+        post: result,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({
+        success: false,
+        message: "Server Error",
+        error: err.message,
+      });
+    });
+};
+
+module.exports = {
+  createPost,
+  getAllPosts,
+  deletePostById,
+  getPostById,
+  updatePostById,
+};
