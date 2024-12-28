@@ -1,64 +1,64 @@
 const commentModel = require("../models/commentSchema");
-const postModel = require("../models/postSchema")
+const postModel = require("../models/postSchema");
 
 const createNewComment = (req, res) => {
   const { postId, commenter, comment } = req.body;
 
-  const newComment = new commentModel({postId, commenter, comment})
-  newComment.save().then((newC)=>{
-    postModel.findById(postId)
-    .then((post)=>{
-        if(!post){
-            res.status(404).json({
-                success:false,
-                message : "Post Not found"
-            })
+  const newComment = new commentModel({ postId, commenter, comment });
+  newComment.save().then((newC) => {
+    postModel
+      .findById(postId)
+      .then((post) => {
+        if (!post) {
+          res.status(404).json({
+            success: false,
+            message: "Post Not found",
+          });
         }
-        post.comments.push(newC._id)
-        return post.save()
-    })
-    .then(()=>{
+        post.comments.push(newC._id);
+        return post.save();
+      })
+      .then(() => {
         res.status(201).json({
-            success:true,
-            message: "Comment Added"
-        })
-    })
-    .catch((err)=>{
+          success: true,
+          message: "Comment Added",
+        });
+      })
+      .catch((err) => {
         console.log(err);
         res.status(500).json({
-            success:false,
-            message:"server Error",
-            error : err.message
-        })
-        
-    })
-  })
+          success: false,
+          message: "server Error",
+          error: err.message,
+        });
+      });
+  });
 
-//   const newComment = new commentModel({
-//     postId,
-//     commenter,
-//     comment,
-//   });
-//   newComment
-//     .save()
-//     .then((result) => {
-//       res.status(201).json({
-//         success: true,
-//         message: "comment added",
-//         comment: {
-//           content: result.content,
-//           author: result.author,
-//         },
-//       });
-//     })
-//     .catch((err) => {
-//       console.error(err);
-//       res.status(409).json({
-//         success: false,
-//         message: "Server Error",
-//         error: err.message,
-//       });
-//     });
+  //   const newComment = new commentModel({
+  //     postId,
+  //     commenter,
+  //     comment,
+  //   });
+  //   newComment
+  //     .save()
+  //     .then((result) => {
+  //       res.status(201).json({
+  //         success: true,
+  //         message: "comment added",
+  //         comment: {
+  //           content: result.content,
+  //           author: result.author,
+  //         },
+  //       });
+  //     })
+  //     .catch((err) => {
+  //       console.error(err);
+  //       res.status(409).json({
+  //         success: false,
+  //         message: "Server Error",
+  //         error: err.message,
+  //       });
+  //     });
 };
 
 const deleteCommentById = (req, res) => {
@@ -94,5 +94,32 @@ const deleteCommentById = (req, res) => {
     });
 };
 
+const updateCommentById = (req, res) => {
+  const commentId = req.params.id;
+  const { comment } = req.body;
+  commentModel
+    .findByIdAndUpdate(commentId, { comment: comment }, { new: true })
+    .then((result) => {
+      if (!result) {
+        return res.status(404).json({
+          success: false,
+          message: "Comment not Found",
+        });
+      }
+      res.status(200).json({
+        success: true,
+        message: "Comment Updated Successfully",
+        comment: result,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({
+        success: false,
+        message: "Server Error",
+        error: err.message,
+      });
+    });
+};
 
-module.exports = { createNewComment, deleteCommentById };
+module.exports = { createNewComment, deleteCommentById , updateCommentById};
