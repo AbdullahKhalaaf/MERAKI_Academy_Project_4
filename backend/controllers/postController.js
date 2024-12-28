@@ -98,9 +98,21 @@ const getPostById = (req, res) => {
   postModel
     .findById(postId)
     .populate({ path: `author`, select: `userName avatar` })
-    .populate({path:`likes`,populate:{
-        path:`userId` , select: `userName avatar`
-    }})
+    .populate({
+      path: `likes`,
+      populate: {
+        path: `userId`,
+        select: `userName avatar`,
+      },
+    })
+    .populate({
+      path: `comments`,
+      select: `comment`,
+      populate: {
+        path: `commenter`,
+        select: `userName avatar`,
+      },
+    })
 
     .then((post) => {
       if (!post) {
