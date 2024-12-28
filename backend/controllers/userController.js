@@ -119,4 +119,34 @@ const getAllUsers = (req, res) => {
     });
 };
 
-module.exports = { userRegister, userLogin, getAllUsers };
+const getUserById = (req, res) => {
+  userId = req.params.id;
+
+  userModel
+    .findById(userId)
+    .select("-password")
+    .populate("following", "userName avatar")
+    .populate("followers", "userName avatar")
+    .then((user) => {
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User Not Found",
+        });
+      }
+      res.status(200).json({
+        success: true,
+        message: " User retrieved successfully",
+        user,
+      });
+    })
+    .catch((err) => {
+      res.status(500).json({
+        success: false,
+        message: "Server Error",
+        error: err.message,
+      });
+    });
+};
+
+module.exports = { userRegister, userLogin, getAllUsers, getUserById };
