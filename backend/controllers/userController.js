@@ -149,4 +149,55 @@ const getUserById = (req, res) => {
     });
 };
 
-module.exports = { userRegister, userLogin, getAllUsers, getUserById };
+const followUser = (req, res) => {
+  // should push the followed user to the logged on user following list
+  // should push the logged on user to the follower list of the  followed user
+
+  const { followedUser } = req.body;
+  const userId = req.token.userId; // logged on
+  console.log("followed user :", followedUser);
+  console.log("userid:", userId);
+
+  if (userId === followedUser) {
+    return res.status(500).json({
+      success: false,
+      message: " you can't follow yourself",
+    });
+  }
+  userModel
+    .findByIdAndUpdate(
+      userId,
+      { $push: { following: followedUser } },
+      { new: true }
+    )
+    .then((result) => {
+      console.log("result : ", result);
+      console.log("userid:", userId);
+
+      userModel.findByIdAndUpdate(
+        followedUser,
+        { $push: { followers: userId } },
+        { new: true }
+      );
+      res.status(200).json({
+        success: true,
+        message: "followed user successfully",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({
+        success: false,
+        message: "server error",
+        error: err.message,
+      });
+    });
+};
+
+module.exports = {
+  userRegister,
+  userLogin,
+  getAllUsers,
+  getUserById,
+  followUser,
+};
