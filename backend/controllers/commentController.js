@@ -1,32 +1,64 @@
 const commentModel = require("../models/commentSchema");
+const postModel = require("../models/postSchema")
 
 const createNewComment = (req, res) => {
   const { postId, commenter, comment } = req.body;
-  const newComment = new commentModel({
-    postId,
-    commenter,
-    comment,
-  });
-  newComment
-    .save()
-    .then((result) => {
-      res.status(201).json({
-        success: true,
-        message: "comment added",
-        comment: {
-          content: result.content,
-          author: result.author,
-        },
-      });
+
+  const newComment = new commentModel({postId, commenter, comment})
+  newComment.save().then((newC)=>{
+    postModel.findById(postId)
+    .then((post)=>{
+        if(!post){
+            res.status(404).json({
+                success:false,
+                message : "Post Not found"
+            })
+        }
+        post.comments.push(newC._id)
+        return post.save()
     })
-    .catch((err) => {
-      console.error(err);
-      res.status(409).json({
-        success: false,
-        message: "Server Error",
-        error: err.message,
-      });
-    });
+    .then(()=>{
+        res.status(201).json({
+            success:true,
+            message: "Comment Added"
+        })
+    })
+    .catch((err)=>{
+        console.log(err);
+        res.status(500).json({
+            success:false,
+            message:"server Error",
+            error : err.message
+        })
+        
+    })
+  })
+
+//   const newComment = new commentModel({
+//     postId,
+//     commenter,
+//     comment,
+//   });
+//   newComment
+//     .save()
+//     .then((result) => {
+//       res.status(201).json({
+//         success: true,
+//         message: "comment added",
+//         comment: {
+//           content: result.content,
+//           author: result.author,
+//         },
+//       });
+//     })
+//     .catch((err) => {
+//       console.error(err);
+//       res.status(409).json({
+//         success: false,
+//         message: "Server Error",
+//         error: err.message,
+//       });
+//     });
 };
 
 const deleteCommentById = (req, res) => {

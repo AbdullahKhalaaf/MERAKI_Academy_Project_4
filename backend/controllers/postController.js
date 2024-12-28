@@ -92,4 +92,37 @@ const deletePostById = (req, res) => {
     });
 };
 
-module.exports = { createPost, getAllPosts, deletePostById };
+const getPostById = (req, res) => {
+  postId = req.params.id;
+
+  postModel
+    .findById(postId)
+    .populate({ path: `author`, select: `userName avatar` })
+    .populate({path:`likes`,populate:{
+        path:`userId` , select: `userName avatar`
+    }})
+
+    .then((post) => {
+      if (!post) {
+        return res.status(404).json({
+          success: false,
+          message: `Post with ID ${postId} not found`,
+        });
+      }
+      res.status(200).json({
+        success: true,
+        message: "Post retrieved successfully",
+        post: post,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({
+        success: false,
+        message: "Server Error",
+        error: err.message,
+      });
+    });
+};
+
+module.exports = { createPost, getAllPosts, deletePostById, getPostById };

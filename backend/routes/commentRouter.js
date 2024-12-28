@@ -6,6 +6,6 @@ const {
 const authentication = require("../middleware/authentication");
 
 const commentRouter = express.Router();
-commentRouter.post("/addComment", authentication, createNewComment);
+commentRouter.post("/:postid/addComment", authentication, createNewComment);
 commentRouter.delete("/:id", authentication, deleteCommentById);
 module.exports = commentRouter;

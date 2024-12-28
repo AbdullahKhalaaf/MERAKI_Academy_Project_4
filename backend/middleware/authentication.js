@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 
 const authentication = (req, res, next) => {
   const authorization = req.headers.authorization;
-  console.log(authorization);
+  // console.log(authorization);
 
   try {
     if (!authorization) {
@@ -20,7 +20,6 @@ const authentication = (req, res, next) => {
         });
       }
       req.token = result;
-      
 
       next();
     });
