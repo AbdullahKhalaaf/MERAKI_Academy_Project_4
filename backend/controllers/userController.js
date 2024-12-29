@@ -164,6 +164,7 @@ const followUser = (req, res) => {
       message: " you can't follow yourself",
     });
   }
+
   userModel
     .findByIdAndUpdate(
       userId,
@@ -171,14 +172,16 @@ const followUser = (req, res) => {
       { new: true }
     )
     .then((result) => {
-      console.log("result : ", result);
-      console.log("userid:", userId);
+      // console.log("result : ", result);
+      // console.log("userid:", userId);
 
-      userModel.findByIdAndUpdate(
+      return userModel.findByIdAndUpdate(
         followedUser,
         { $push: { followers: userId } },
         { new: true }
       );
+    })
+    .then(() => {
       res.status(200).json({
         success: true,
         message: "followed user successfully",
