@@ -197,10 +197,56 @@ const followUser = (req, res) => {
     });
 };
 
+const unfollowUser = (req, res) => {
+  const { followedUser } = req.body;
+  const userId = req.token.userId;
+  console.log("followed user to unfollow:", followedUser);
+  console.log("logged-in userId:", userId);
+
+  if (userId === followedUser) {
+    return res.status(500).json({
+      success: false,
+      message: "You can't unfollow yourself",
+    });
+  }
+
+  userModel
+    .findByIdAndUpdate(
+      userId,
+      { $pull: { following: followedUser } },
+      { new: true }
+    )
+    .then((result) => {
+      // console.log("result : ", result);
+      // console.log("userid:", userId);
+
+      return userModel.findByIdAndUpdate(
+        followedUser,
+        { $pull: { followers: userId } },
+        { new: true }
+      );
+    })
+    .then(() => {
+      res.status(200).json({
+        success: true,
+        message: "Unfollowed user successfully",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({
+        success: false,
+        message: "Server error",
+        error: err.message,
+      });
+    });
+};
+
 module.exports = {
   userRegister,
   userLogin,
   getAllUsers,
   getUserById,
   followUser,
+  unfollowUser,
 };
