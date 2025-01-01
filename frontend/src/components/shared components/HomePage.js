@@ -6,10 +6,12 @@ import { useContext } from "react";
 import { jwtDecode } from "jwt-decode";
 const HomePage = () => {
   const [posts, setPosts] = useState([]);
+  const [author, setAuthor] = useState("");
   const navigate = useNavigate();
   const [content, setContent] = useState("");
   const [userId, setUserId] = useState("");
   const { setToken, token, setIsLoggedIn } = useContext(UserContext);
+  console.log("token", token);
 
   useEffect(() => {
     axios
@@ -25,12 +27,13 @@ const HomePage = () => {
   const handleAuthorClick = (authorId) => {
     navigate(`/profile/${authorId}`);
   };
+  console.log(posts);
 
   // const handleEditClick = (postId) => {
   //   navigate(`/${postId}`);
   // };
   const decodeToken = jwtDecode(token);
-
+  const newPost = { content, author: decodeToken.userId };
   const handleCreatePostClick = () => {
     axios
       .post(
@@ -38,18 +41,24 @@ const HomePage = () => {
         { content, author: decodeToken.userId },
         {
           headers: {
-            Authoraization: `brear${token}`,
+            Authoraization: `Bearer ${token}`,
           },
         }
       )
       .then((response) => {
+        console.log(response);
+        const createdPost = response.data.post
         console.log("Post Created ");
-        setUserId(decodeToken.userId);
+       
+        setPosts([createdPost, ...posts]);
         navigate("/home");
+    
+        
+        console.log(posts);
       })
       .catch((err) => {
         console.log(err);
-        console.log("userid form token", decodeToken.userId);
+        
       });
   };
 
@@ -77,7 +86,7 @@ const HomePage = () => {
             }}
           >
             <div>
-              <img src={post.author?.avatar} alt={post.author?.avatar} />
+              <img src={post.avatar} alt={post.avatar} />
               <span
                 onClick={() => handleAuthorClick(post.author._id)}
                 style={{ cursor: "pointer", color: "blue" }}
@@ -85,7 +94,7 @@ const HomePage = () => {
                 {post.author?.userName}
               </span>
             </div>
-            <h3>{post.title}</h3>
+
             <p>{post.content}</p>
             <div>
               <span>{post.likes?.length} Likes</span>

@@ -12,18 +12,20 @@ export const UserContext = createContext();
 const App = () => {
   const storedToken = localStorage.getItem("token");
   const [token, setToken] = useState(storedToken || "");
-  const [isLoggedIn, setIsLoggedIn] = useState(storedToken ? "true" : ""); 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     setToken("");
-    setIsLoggedIn(""); 
+    setIsLoggedIn("");
     navigate("/login");
   };
 
   return (
-    <UserContext.Provider value={{ token, setToken, isLoggedIn, setIsLoggedIn }}>
+    <UserContext.Provider
+      value={{ token, setToken, isLoggedIn, setIsLoggedIn }}
+    >
       <div className="App">
         <h1>App</h1>
         <header>

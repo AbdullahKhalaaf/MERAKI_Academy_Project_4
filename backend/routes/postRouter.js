@@ -10,7 +10,7 @@ const {
 const postRouter = express.Router();
 const authentication = require("../middleware/authentication");
 
-postRouter.post("/create", createPost);
+postRouter.post("/create",authentication, createPost);
 postRouter.get("/", getAllPosts);
 postRouter.delete("/deletePost/:id", authentication, deletePostById);
 postRouter.get("/:id", getPostById);
