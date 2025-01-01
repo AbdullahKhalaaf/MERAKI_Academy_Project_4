@@ -3,23 +3,23 @@ import "./App.css";
 import Login from "./components/shared components/Login";
 import Register from "./components/shared components/Register";
 import Navbar from "./components/shared components/Navbar";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import HomePage from "./components/shared components/HomePage";
-import { useNavigate } from "react-router-dom"; 
+import Profile from "./components/shared components/Profile";
 
 export const UserContext = createContext();
 
 const App = () => {
   const storedToken = localStorage.getItem("token");
   const [token, setToken] = useState(storedToken || "");
-  const [isLoggedIn, setIsLoggedIn] = useState(!!storedToken);
-  const navigate = useNavigate(); 
+  const [isLoggedIn, setIsLoggedIn] = useState(storedToken ? "true" : ""); 
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     setToken("");
-    setIsLoggedIn(false);
-    navigate("/login"); 
+    setIsLoggedIn(""); 
+    navigate("/login");
   };
 
   return (
@@ -27,13 +27,13 @@ const App = () => {
       <div className="App">
         <h1>App</h1>
         <header>
-          <Navbar />
+          <Navbar handleLogout={handleLogout} />
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register setIsLoggedIn={setIsLoggedIn} setToken={setToken} />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/home" element={<HomePage />} />
+            <Route path="/profile/:id" element={<Profile />} />
           </Routes>
-          {isLoggedIn && <button onClick={handleLogout}>Logout</button>}
         </header>
       </div>
     </UserContext.Provider>
