@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const postModel = require("../models/postSchema");
+const { post } = require("../routes/userRouter");
 
 const createPost = (req, res) => {
   const { content, author, comments, likes } = req.body;
@@ -137,6 +138,51 @@ const getPostById = (req, res) => {
     });
 };
 
+const getPostByUserId = (req, res) => {
+  authorId = req.params.id;
+
+  postModel
+    .find({ author: authorId })
+    .populate({ path: `author`, select: `userName avatar` })
+    .populate({
+      path: `likes`,
+      populate: {
+        path: `userId`,
+        select: `userName avatar`,
+      },
+    })
+    .populate({
+      path: `comments`,
+      select: `comment`,
+      populate: {
+        path: `commenter`,
+        select: `userName avatar`,
+      },
+    })
+
+    .then((post) => {
+      if (!post) {
+        return res.status(404).json({
+          success: false,
+          message: `Post with ID ${authorId} not found`,
+        });
+      }
+      res.status(200).json({
+        success: true,
+        message: "Post retrieved successfully",
+        post: post,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({
+        success: false,
+        message: "Server Error",
+        error: err.message,
+      });
+    });
+};
+
 const updatePostById = (req, res) => {
   const postId = req.params.id;
 
@@ -172,4 +218,5 @@ module.exports = {
   deletePostById,
   getPostById,
   updatePostById,
+  getPostByUserId,
 };

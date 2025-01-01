@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { UserContext } from "../../App";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -16,6 +17,8 @@ const Login = () => {
       .then((response) => {
         const token = response.data.token;
         localStorage.setItem("token", token);
+       
+
         setToken(token);
         setIsLoggedIn(true);
         navigate("/home");

@@ -9,17 +9,16 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    
     axios
       .get(`http://localhost:5000/users/${id}`)
       .then((response) => {
         setUser(response.data.user);
-      
-        return axios.get(`http://localhost:5000/posts/${id}`);
+
+        return axios.get(`http://localhost:5000/posts/user/${id}`);
       })
       .then((response) => {
-        setUserPosts(response.data.posts);
-        console.log(userPosts);
+        setUserPosts(response.data.post);
+        console.log("userPosts", response.data.post);
 
         setLoading(false);
       })
@@ -72,7 +71,7 @@ const Profile = () => {
           </ul>
 
           <h3>Posts by {user.userName}</h3>
-          {userPosts.length > 0 ? (
+          {userPosts ? (
             userPosts.map((post) => (
               <div
                 key={post._id}

@@ -3,10 +3,12 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../App";
 import { useContext } from "react";
-
+import { jwtDecode } from "jwt-decode";
 const HomePage = () => {
   const [posts, setPosts] = useState([]);
   const navigate = useNavigate();
+  const [content, setContent] = useState("");
+  const [userId, setUserId] = useState("");
   const { setToken, token, setIsLoggedIn } = useContext(UserContext);
 
   useEffect(() => {
@@ -24,13 +26,46 @@ const HomePage = () => {
     navigate(`/profile/${authorId}`);
   };
 
-  const handleEditClick = (postId) => {
-    navigate(`/edit-post/${postId}`);
+  // const handleEditClick = (postId) => {
+  //   navigate(`/${postId}`);
+  // };
+  const decodeToken = jwtDecode(token);
+
+  const handleCreatePostClick = () => {
+    axios
+      .post(
+        "http://localhost:5000/posts/create",
+        { content, author: decodeToken.userId },
+        {
+          headers: {
+            Authoraization: `brear${token}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log("Post Created ");
+        setUserId(decodeToken.userId);
+        navigate("/home");
+      })
+      .catch((err) => {
+        console.log(err);
+        console.log("userid form token", decodeToken.userId);
+      });
   };
 
   return (
     <div>
       <h2>Home Page</h2>
+      <div>
+        <textarea
+          placeholder="Create a new post"
+          type="text"
+          onChange={(e) => {
+            setContent(e.target.value);
+          }}
+        />
+        <button onClick={handleCreatePostClick}>Post</button>
+      </div>
       {posts.length > 0 ? (
         posts.map((post) => (
           <div
@@ -54,16 +89,6 @@ const HomePage = () => {
             <p>{post.content}</p>
             <div>
               <span>{post.likes?.length} Likes</span>
-            </div>
-            <div>
-              {post.author._id === token?._id && (
-                <button
-                  onClick={() => handleEditClick(post._id)}
-                 
-                >
-                  Edit Post
-                </button>
-              )}
             </div>
           </div>
         ))

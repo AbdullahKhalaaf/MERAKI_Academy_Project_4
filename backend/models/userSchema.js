@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
     default:
       "https://icons.veryicon.com/png/o/miscellaneous/rookie-official-icon-gallery/225-default-avatar.png",
   },
+  
 });
 userSchema.pre("save", async function () {
   this.email = this.email.toLowerCase();
