@@ -23,20 +23,22 @@ const HomePage = () => {
       });
   }, []);
 
+  const handleAuthorClick = (authorId) => {
+    navigate(`/profile/${authorId}`);
+  };
   
   const handleLikeClick = (postId, userId, isLiked) => {
     if (isLiked) {
-   
       axios
         .delete(`http://localhost:5000/likes/deleteLike/${postId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          data: { userId },
+          data: { postId, userId }, // Send postId and userId here
         })
         .then((result) => {
           console.log("Unlike result", result);
-         
+  
           setPosts((prevPosts) =>
             prevPosts.map((post) =>
               post._id === postId
@@ -49,11 +51,10 @@ const HomePage = () => {
           console.log("error", err);
         });
     } else {
-     
       axios
         .post(
           `http://localhost:5000/likes/${postId}/newLike`,
-          { postId },
+          { postId, userId }, // Send both postId and userId here
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -62,7 +63,7 @@ const HomePage = () => {
         )
         .then((result) => {
           console.log("Like result", result);
-          
+  
           setPosts((prevPosts) =>
             prevPosts.map((post) =>
               post._id === postId
@@ -94,7 +95,7 @@ const HomePage = () => {
       .then((response) => {
         console.log(response);
         const createdPost = response.data.post;
-        console.log("Post Created");
+        console.log(response);
 
         setPosts([createdPost, ...posts]);
         navigate("/home");
@@ -105,7 +106,6 @@ const HomePage = () => {
         console.log(err);
       });
   };
-
   return (
     <div>
       <h2>Home Page</h2>

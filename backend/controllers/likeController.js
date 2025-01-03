@@ -2,17 +2,14 @@ const mongoose = require("mongoose");
 const likeModel = require("../models/likeSchema");
 const postModel = require("../models/postSchema");
 
-
 const createNewLike = (req, res) => {
   const { postId, userId } = req.body;
-
 
   const newLike = new likeModel({ postId, userId });
 
   newLike
     .save()
     .then((newL) => {
-   
       postModel
         .findById(postId)
         .then((post) => {
@@ -23,7 +20,6 @@ const createNewLike = (req, res) => {
             });
           }
 
-         
           post.likes.push(newL._id);
           return post.save();
         })
@@ -52,18 +48,12 @@ const createNewLike = (req, res) => {
     });
 };
 
-
 const deleteLikeByUserAndPost = (req, res) => {
-  const { postId } = req.params; 
-  const { userId } = req.body; 
-  console.log("Received postId:", postId);
-  console.log("Received userId:", userId);
+  const { postId, userId } = req.body; // Get postId and userId from the request body
 
   likeModel
     .findOneAndDelete({ postId: postId, userId: userId })
     .then((result) => {
-      console.log("result of unlike",result);
-      
       if (!result) {
         return res.status(404).json({
           success: false,
@@ -71,7 +61,6 @@ const deleteLikeByUserAndPost = (req, res) => {
         });
       }
 
-  
       postModel
         .findById(postId)
         .then((post) => {
@@ -82,7 +71,7 @@ const deleteLikeByUserAndPost = (req, res) => {
             });
           }
 
-         
+          // Remove the like from the post's likes array
           post.likes = post.likes.filter(
             (likeId) => likeId.toString() !== result._id.toString()
           );
