@@ -1,5 +1,6 @@
 const commentModel = require("../models/commentSchema");
 const postModel = require("../models/postSchema");
+const { post } = require("../routes/userRouter");
 
 const createNewComment = (req, res) => {
   const { postId, commenter, comment } = req.body;
@@ -33,9 +34,57 @@ const createNewComment = (req, res) => {
         });
       });
   });
-
-  
 };
+
+const gettAllComments = (req, res) => {
+  commentModel
+    .find({})
+    .then((result) => {
+      console.log(result);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+const getCommentsByPostId = (req, res) => {
+  const postId = req.params.id;
+
+  postModel
+    .findById(postId)
+    .populate({
+      path: 'comments',
+      select: 'comment',
+      populate: {
+        path: 'commenter',
+        select: 'userName avatar',
+      },
+    })
+    .then((result) => {
+      if (!result) {
+        return res.status(404).json({
+          success: false,
+          message: `Post with ${postId} not found`,
+        });
+      }
+
+      console.log("result", result);
+      res.status(200).json({
+        success: true,
+        message: "Comment retrieved successfully",
+        data: result,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({
+        success: false,
+        message: "Server Error",
+        error: err.message,
+      });
+    });
+};
+
 
 const deleteCommentById = (req, res) => {
   const commentId = req.params.id;
@@ -50,12 +99,6 @@ const deleteCommentById = (req, res) => {
           message: `The Comment with ID ${commentId} was not found.`,
         });
       }
-      //   if (req.token.userId !== result.commenter.toString()) {
-      //     return res.status(403).json({
-      //       success: false,
-      //       message: "You are not authorized to delete this Comment.",
-      //     });
-      //   }
       return res.status(200).json({
         success: true,
         message: "The Comment deleted successfully",
@@ -98,6 +141,10 @@ const updateCommentById = (req, res) => {
     });
 };
 
-
-
-module.exports = { createNewComment, deleteCommentById , updateCommentById};
+module.exports = {
+  createNewComment,
+  deleteCommentById,
+  updateCommentById,
+  getCommentsByPostId,
+  gettAllComments,
+};

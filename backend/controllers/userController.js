@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const userRegister = (req, res) => {
   const { userName, email, password, role, avatar, following, followers } =
     req.body;
-    const defaultRoleId ="676ddd1c238eb5e507973ee5"
+  const defaultRoleId = "676ddd1c238eb5e507973ee5";
   const newUser = new userModel({
     userName,
     email,
@@ -91,13 +91,11 @@ const userLogin = (req, res) => {
       });
     })
     .catch((err) => {
-      console.error('Login Error:', err);  
+      console.error("Login Error:", err);
       res.status(500).json({
         success: false,
         message: "Server Error",
         error: err.message,
-        
-        
       });
     });
 };

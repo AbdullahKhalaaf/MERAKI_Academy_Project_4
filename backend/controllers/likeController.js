@@ -49,7 +49,7 @@ const createNewLike = (req, res) => {
 };
 
 const deleteLikeByUserAndPost = (req, res) => {
-  const { postId, userId } = req.body; 
+  const { postId, userId } = req.body;
 
   likeModel
     .findOneAndDelete({ postId: postId, userId: userId })
@@ -71,7 +71,6 @@ const deleteLikeByUserAndPost = (req, res) => {
             });
           }
 
-        
           post.likes = post.likes.filter(
             (likeId) => likeId.toString() !== result._id.toString()
           );

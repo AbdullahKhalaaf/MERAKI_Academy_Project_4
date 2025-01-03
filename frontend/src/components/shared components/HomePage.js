@@ -10,7 +10,7 @@ const HomePage = () => {
   const [content, setContent] = useState("");
   const { token } = useContext(UserContext);
   const navigate = useNavigate();
-
+  const [comments, setComments] = useState([]);
 
   useEffect(() => {
     axios
@@ -22,11 +22,29 @@ const HomePage = () => {
         console.error("Error fetching posts:", err);
       });
   }, []);
+  useEffect(() => {
+    if (posts.length > 0) {
+      posts.forEach((post) => {
+        axios
+          .get(`http://localhost:5000/comments/get/${post._id}`)
+          .then((response) => {
+            console.log(response);
+            setComments((prevComments) => [
+              ...prevComments,
+              { postId: post._id, comments: response.data.comments },
+            ]);
+          })
+          .catch((err) => {
+            console.log("Error fetching comments:", err);
+          });
+      });
+    }
+  }, [posts]);
 
   const handleAuthorClick = (authorId) => {
     navigate(`/profile/${authorId}`);
   };
-  
+
   const handleLikeClick = (postId, userId, isLiked) => {
     if (isLiked) {
       axios
@@ -34,11 +52,11 @@ const HomePage = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          data: { postId, userId }, 
+          data: { postId, userId },
         })
         .then((result) => {
           console.log("Unlike result", result);
-  
+
           setPosts((prevPosts) =>
             prevPosts.map((post) =>
               post._id === postId
@@ -54,7 +72,7 @@ const HomePage = () => {
       axios
         .post(
           `http://localhost:5000/likes/${postId}/newLike`,
-          { postId, userId }, 
+          { postId, userId },
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -63,7 +81,7 @@ const HomePage = () => {
         )
         .then((result) => {
           console.log("Like result", result);
-  
+
           setPosts((prevPosts) =>
             prevPosts.map((post) =>
               post._id === postId
@@ -77,7 +95,6 @@ const HomePage = () => {
         });
     }
   };
-
 
   const decodeToken = jwtDecode(token);
   const newPost = { content, author: decodeToken.userId };
@@ -118,47 +135,62 @@ const HomePage = () => {
         <button onClick={handleCreatePostClick}>Post</button>
       </div>
       {posts.length > 0 ? (
-        posts.map((post) => {
-          const isLiked = post.likes.includes(decodeToken.userId); 
+  posts.map((post) => {
+    const isLiked = post.likes.includes(decodeToken.userId);
+    console.log("post", post);
 
-          return (
-            <div
-              key={post._id}
-              style={{
-                border: "1px solid #ddd",
-                padding: "10px",
-                marginBottom: "10px",
-              }}
-            >
-              <div>
-                <img src={post.avatar} alt={post.avatar} />
-                <span
-                  onClick={() => navigate(`/profile/${post.author._id}`)}
-                  style={{ cursor: "pointer", color: "blue" }}
-                >
-                  {post.author?.userName}
-                </span>
-              </div>
+    return (
+      <div
+        key={post._id}
+        style={{
+          border: "1px solid #ddd",
+          padding: "10px",
+          marginBottom: "10px",
+        }}
+      >
+        <div>
+          <img src={post.avatar} alt={post.avatar} />
+          <span
+            onClick={() => navigate(`/profile/${post.author._id}`)}
+            style={{ cursor: "pointer", color: "blue" }}
+          >
+            {post.author?.userName}
+          </span>
+        </div>
 
-              <p>{post.content}</p>
-              <div>
-                <span>{post.likes.length} Likes</span>
-                <span>
-                  <button
-                    onClick={() =>
-                      handleLikeClick(post._id, decodeToken.userId, isLiked)
-                    }
-                  >
-                    {isLiked ? "Unlike" : "Like"} 
-                  </button>
-                </span>
-              </div>
+        <p>{post.content}</p>
+
+        {post.comments && post.comments.length > 0 ? (
+          post.comments.map((comment, index) => (
+            <div key={index}>
+              <p>
+                <strong>{comment.commenter?.userName}</strong>: {comment.comment}
+              </p>
             </div>
-          );
-        })
-      ) : (
-        <p>No posts available.</p>
-      )}
+          ))
+        ) : (
+          <p>No comments yet.</p>
+        )}
+
+        <div>
+          <span>{post.likes.length} Likes</span>
+          <span></span>
+          <span>
+            <button
+              onClick={() =>
+                handleLikeClick(post._id, decodeToken.userId, isLiked)
+              }
+            >
+              {isLiked ? "Unlike" : "Like"}
+            </button>
+          </span>
+        </div>
+      </div>
+    );
+  })
+) : (
+  <p>No posts available.</p>
+)}
     </div>
   );
 };
