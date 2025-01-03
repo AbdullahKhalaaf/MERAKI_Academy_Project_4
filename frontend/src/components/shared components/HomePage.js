@@ -34,7 +34,7 @@ const HomePage = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          data: { postId, userId }, // Send postId and userId here
+          data: { postId, userId }, 
         })
         .then((result) => {
           console.log("Unlike result", result);
@@ -54,7 +54,7 @@ const HomePage = () => {
       axios
         .post(
           `http://localhost:5000/likes/${postId}/newLike`,
-          { postId, userId }, // Send both postId and userId here
+          { postId, userId }, 
           {
             headers: {
               Authorization: `Bearer ${token}`,
