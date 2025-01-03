@@ -16,6 +16,7 @@ const createPost = (req, res) => {
     .save()
     .then((result) => {
       console.log(result);
+      
       res.status(201).json({
         success: true,
         message: "Post Created",

@@ -1,11 +1,11 @@
 const express = require("express");
 const {
   createNewLike,
-  deleteLikeById,
+  deleteLikeByUserAndPost,
 } = require("../controllers/likeController");
 const likeRouter = express.Router();
 const authentication = require("../middleware/authentication");
 
-likeRouter.post("/:postId/newLike", authentication, createNewLike);
-likeRouter.delete("/deleteLike/:id", authentication, deleteLikeById);
+likeRouter.post("/:postId/newLike",  createNewLike);
+likeRouter.delete("/deleteLike/:id", authentication, deleteLikeByUserAndPost);
 module.exports = likeRouter;

@@ -4,14 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../App";
 import { useContext } from "react";
 import { jwtDecode } from "jwt-decode";
+
 const HomePage = () => {
   const [posts, setPosts] = useState([]);
-  const [author, setAuthor] = useState("");
-  const navigate = useNavigate();
   const [content, setContent] = useState("");
-  const [userId, setUserId] = useState("");
-  const { setToken, token, setIsLoggedIn } = useContext(UserContext);
-  console.log("token", token);
+  const { token } = useContext(UserContext);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     axios
@@ -24,14 +23,61 @@ const HomePage = () => {
       });
   }, []);
 
-  const handleAuthorClick = (authorId) => {
-    navigate(`/profile/${authorId}`);
+  
+  const handleLikeClick = (postId, userId, isLiked) => {
+    if (isLiked) {
+   
+      axios
+        .delete(`http://localhost:5000/likes/deleteLike/${postId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          data: { userId },
+        })
+        .then((result) => {
+          console.log("Unlike result", result);
+         
+          setPosts((prevPosts) =>
+            prevPosts.map((post) =>
+              post._id === postId
+                ? { ...post, likes: post.likes.filter((id) => id !== userId) }
+                : post
+            )
+          );
+        })
+        .catch((err) => {
+          console.log("error", err);
+        });
+    } else {
+     
+      axios
+        .post(
+          `http://localhost:5000/likes/${postId}/newLike`,
+          { postId },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((result) => {
+          console.log("Like result", result);
+          
+          setPosts((prevPosts) =>
+            prevPosts.map((post) =>
+              post._id === postId
+                ? { ...post, likes: [...post.likes, userId] }
+                : post
+            )
+          );
+        })
+        .catch((err) => {
+          console.log("error", err);
+        });
+    }
   };
-  console.log(posts);
 
-  // const handleEditClick = (postId) => {
-  //   navigate(`/${postId}`);
-  // };
+
   const decodeToken = jwtDecode(token);
   const newPost = { content, author: decodeToken.userId };
   const handleCreatePostClick = () => {
@@ -41,24 +87,22 @@ const HomePage = () => {
         { content, author: decodeToken.userId },
         {
           headers: {
-            Authoraization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       )
       .then((response) => {
         console.log(response);
-        const createdPost = response.data.post
-        console.log("Post Created ");
-       
+        const createdPost = response.data.post;
+        console.log("Post Created");
+
         setPosts([createdPost, ...posts]);
         navigate("/home");
-    
-        
+
         console.log(posts);
       })
       .catch((err) => {
         console.log(err);
-        
       });
   };
 
@@ -69,38 +113,49 @@ const HomePage = () => {
         <textarea
           placeholder="Create a new post"
           type="text"
-          onChange={(e) => {
-            setContent(e.target.value);
-          }}
+          onChange={(e) => setContent(e.target.value)}
         />
         <button onClick={handleCreatePostClick}>Post</button>
       </div>
       {posts.length > 0 ? (
-        posts.map((post) => (
-          <div
-            key={post._id}
-            style={{
-              border: "1px solid #ddd",
-              padding: "10px",
-              marginBottom: "10px",
-            }}
-          >
-            <div>
-              <img src={post.avatar} alt={post.avatar} />
-              <span
-                onClick={() => handleAuthorClick(post.author._id)}
-                style={{ cursor: "pointer", color: "blue" }}
-              >
-                {post.author?.userName}
-              </span>
-            </div>
+        posts.map((post) => {
+          const isLiked = post.likes.includes(decodeToken.userId); 
 
-            <p>{post.content}</p>
-            <div>
-              <span>{post.likes?.length} Likes</span>
+          return (
+            <div
+              key={post._id}
+              style={{
+                border: "1px solid #ddd",
+                padding: "10px",
+                marginBottom: "10px",
+              }}
+            >
+              <div>
+                <img src={post.avatar} alt={post.avatar} />
+                <span
+                  onClick={() => navigate(`/profile/${post.author._id}`)}
+                  style={{ cursor: "pointer", color: "blue" }}
+                >
+                  {post.author?.userName}
+                </span>
+              </div>
+
+              <p>{post.content}</p>
+              <div>
+                <span>{post.likes.length} Likes</span>
+                <span>
+                  <button
+                    onClick={() =>
+                      handleLikeClick(post._id, decodeToken.userId, isLiked)
+                    }
+                  >
+                    {isLiked ? "Unlike" : "Like"} 
+                  </button>
+                </span>
+              </div>
             </div>
-          </div>
-        ))
+          );
+        })
       ) : (
         <p>No posts available.</p>
       )}
