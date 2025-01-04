@@ -14,37 +14,48 @@ const createNewLike = (req, res) => {
         .findById(postId)
         .then((post) => {
           if (!post) {
+            // Return here to prevent further execution
             return res.status(404).json({
               success: false,
-              message: "Post not Found",
+              message: "Post not found",
             });
           }
 
           post.likes.push(newL._id);
-          return post.save();
-        })
-        .then(() => {
-          res.status(201).json({
-            success: true,
-            message: "Like added successfully",
+          return post.save().then(() => {
+            // Send success response after post is updated
+            res.status(201).json({
+              success: true,
+              message: "Like added successfully",
+            });
           });
         })
         .catch((err) => {
+          // Catch block for finding the post or saving the post
           console.error(err);
-          res.status(500).json({
-            success: false,
-            message: "Server Error",
-            error: err.message,
-          });
+
+          // Send error response only if it hasn't been sent
+          if (!res.headersSent) {
+            res.status(500).json({
+              success: false,
+              message: "Server Error",
+              error: err.message,
+            });
+          }
         });
     })
     .catch((err) => {
+      // Catch block for saving the new like
       console.error(err);
-      res.status(500).json({
-        success: false,
-        message: "Error adding like",
-        error: err.message,
-      });
+
+      // Send error response only if it hasn't been sent
+      if (!res.headersSent) {
+        res.status(500).json({
+          success: false,
+          message: "Error adding like",
+          error: err.message,
+        });
+      }
     });
 };
 

@@ -1,57 +1,61 @@
-import React, { useState } from "react";
+import React from "react";
+import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
-const Register = ({ setIsLoggedIn, setToken }) => {
+const Register = () => {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [userName, setUserName] = useState("");
-  const [error, setError] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const [message,setMessage] = useState("")
 
   const handleRegister = () => {
-    axios
-      .post("http://localhost:5000/users/register", {
-        email,
-        password,
-        userName,
-      })
-      .then((response) => {
-        const token = response.data.token;
-        localStorage.setItem("token", token);
-        setToken(token);
-        setIsLoggedIn(true);
-        navigate("/home");
-      })
-      .catch((err) => {
-        const errorMessage = err.response?.data?.message;
-        setError(errorMessage);
-      });
+    axios.post("http://localhost:5000/users/register", {
+      email,
+      password,
+      userName,
+    })
+    .then((response)=>{
+      console.log("response",response);
+      navigate("/Login")
+      setMessage(response.data.message)
+    }).catch((err)=>{setMessage(err.data.message)
+    })
   };
 
-  return (
-    <div>
-      <input
-        type="text"
-        placeholder="Username"
-        onChange={(e) => {
-          setUserName(e.target.value);
-        }}
-      />
-      <input
-        type="email"
-        placeholder="email"
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="password"
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button onClick={handleRegister}>Register</button>
-      {error && <p>{error}</p>}
-    </div>
-  );
+  return <div>
+      <div className="mb-3">
+        <input
+          className="form-control"
+          type="email"
+          placeholder="email"
+        onChange={(e)=>{setEmail(e.target.value)}}
+        />
+      </div>
+      <div className="mb-3">
+        <input
+          className="form-control"
+          type="text"
+          placeholder="usename"
+        onChange={(e)=>{setUserName(e.target.value)}}
+        />
+      </div>
+      <div className="mb-3">
+        <input
+          className="form-control"
+          type="password"
+          placeholder="password"
+        onChange={(e)=>{setPassword(e.target.value)}}
+        />
+      </div>
+      <button onClick={()=>{
+        handleRegister()
+      }} type="button" class="btn btn-primary">Register</button>
+
+
+
+
+  </div>;
 };
 
 export default Register;

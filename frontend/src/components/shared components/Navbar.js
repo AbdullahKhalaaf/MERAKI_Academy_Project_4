@@ -1,40 +1,39 @@
-import React, { useContext,useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { UserContext } from "../../App";
+import React, { useContext } from "react";
+import { Navbar, Nav } from "react-bootstrap";
+import { userContext } from "../../App";
 
+const NavbarComponent = () => {
+  const { token, setToken } = useContext(userContext);
 
-
-
-const Navbar = () => {
-  const storedToken = localStorage.getItem("token");
-
-  const navigate = useNavigate();
-    const [token, setToken] = useState(storedToken || "");
-    const [isLoggedIn, setIsLoggedIn] = useState(!!storedToken);
-   const handleLogout = () => {
-      localStorage.removeItem("token");
-      setToken("");
-      setIsLoggedIn(false);
-      navigate("/login");
-    };
-  
+  const handleLogOut = () => {
+    setToken(null);
+    localStorage.removeItem("token");
+  };
 
   return (
-    <nav>
-      {isLoggedIn ? (
-        <>
-          <button onClick={() => navigate("/home")}>Home Page</button>
-            <button onClick={handleLogout}>Logout</button>
-        </>
-      ) : (
-        <>
-          <button onClick={() => navigate("/login")}>Login</button>
-          <button onClick={() => navigate("/register")}>Register</button>
-
-        </>
-      )}
-    </nav>
+    <Navbar bg="light" expand="lg">
+      <Navbar.Brand href="/">My App</Navbar.Brand>
+      <Navbar.Toggle aria-controls="basic-navbar-nav" />
+      <Navbar.Collapse id="basic-navbar-nav">
+        <Nav className="me-auto">
+          {token ? (
+            <>
+              <Nav.Link href="/dashboard/:id">Profile</Nav.Link>
+              <Nav.Link href="/timeline"> Home</Nav.Link>
+              <Nav.Link href="/" onClick={handleLogOut}>
+                Logout
+              </Nav.Link>
+            </>
+          ) : (
+            <>
+              <Nav.Link href="/Login">Login</Nav.Link>
+              <Nav.Link href="/Register">register</Nav.Link>
+            </>
+          )}
+        </Nav>
+      </Navbar.Collapse>
+    </Navbar>
   );
 };
 
-export default Navbar;
+export default NavbarComponent;

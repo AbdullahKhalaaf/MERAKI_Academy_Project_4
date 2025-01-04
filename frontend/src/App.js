@@ -1,45 +1,36 @@
-import React, { createContext, useState } from "react";
+import React from 'react'
 import "./App.css";
-import Login from "./components/shared components/Login";
-import Register from "./components/shared components/Register";
-import Navbar from "./components/shared components/Navbar";
-import { Route, Routes, useNavigate } from "react-router-dom";
-import HomePage from "./components/shared components/HomePage";
-import Profile from "./components/shared components/Profile";
+import { useState,createContext } from 'react';
+import { Routes,Route } from 'react-router-dom';
+import Login from './components/shared components/Login';
+import Navbar from './components/shared components/Navbar';
+import Register from './components/shared components/Register';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import TimeLine from './components/shared components/TimeLine';
+import Dashboard from './components/shared components/Dashboard';
 
-export const UserContext = createContext();
-
+export const userContext = createContext()
 const App = () => {
-  const storedToken = localStorage.getItem("token");
-  const [token, setToken] = useState(storedToken || "");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const navigate = useNavigate();
+const [token , setToken] = useState(localStorage.getItem("token"))
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setToken("");
-    setIsLoggedIn("");
-    navigate("/login");
-  };
 
   return (
-    <UserContext.Provider
-      value={{ token, setToken, isLoggedIn, setIsLoggedIn }}
-    >
-      <div className="App">
-        <h1>App</h1>
-        <header>
-          <Navbar handleLogout={handleLogout} />
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/home" element={<HomePage />} />
-            <Route path="/profile/:id" element={<Profile />} />
-          </Routes>
-        </header>
-      </div>
-    </UserContext.Provider>
-  );
-};
+    <>
+    <userContext.Provider value={{token, setToken}}>
+   <div className="App">
+          <Navbar />
+        </div>
+    <Routes>
+          <Route path="/Login" element={<Login />} />
+          <Route path="/Register" element={<Register />} />
+          <Route path="/timeline" element={<TimeLine />} />
+          <Route path="/dashboard/:id" element={<Dashboard />} />
+          
+          
+        </Routes>
+    </userContext.Provider>
+    </>
+  )
+}
 
-export default App;
+export default App
