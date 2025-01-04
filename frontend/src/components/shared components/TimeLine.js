@@ -48,6 +48,7 @@ const TimeLine = () => {
                       post.comments.map((comment, index) => (
                         <p>
                           <strong>{comment.commenter.userName}</strong>
+                          <br></br>
                           {comment.comment}
                         </p>
                       ))
