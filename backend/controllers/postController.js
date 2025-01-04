@@ -44,7 +44,13 @@ const getAllPosts = (req, res) => {
       select: "userName",
     })
     .populate("likes")
-    .populate("comments")
+    .populate({
+      path: "comments", 
+      populate: { 
+        path: "commenter", 
+        select: "userName avatar" 
+      }
+    })
     .then((result) => {
       res.status(200).json({
         success: true,
