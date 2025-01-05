@@ -5,35 +5,53 @@ const { post } = require("../routes/userRouter");
 const createNewComment = (req, res) => {
   const { postId, commenter, comment } = req.body;
 
+  // if (!postId || !commenter || !comment) {
+  //   return res.status(400).json({
+  //     success: false,
+  //     message: "All fields are required",
+  //   });
+  // }
+
   const newComment = new commentModel({ postId, commenter, comment });
-  newComment.save().then((newC) => {
-    postModel
-      .findById(postId)
-      .then((post) => {
-        if (!post) {
-          res.status(404).json({
-            success: false,
-            message: "Post Not found",
+
+  newComment
+    .save()
+    .then((newC) => {
+      postModel
+        .findById(postId)
+        .then((post) => {
+          if (!post) {
+            return res.status(404).json({
+              success: false,
+              message: "Post Not Found",
+            });
+          }
+          post.comments.push(newC._id);
+          return post.save();
+        })
+        .then(() => {
+          res.status(201).json({
+            success: true,
+            message: "Comment Added",
           });
-        }
-        post.comments.push(newC._id);
-        return post.save();
-      })
-      .then(() => {
-        res.status(201).json({
-          success: true,
-          message: "Comment Added",
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(500).json({
+            success: false,
+            message: "Server Error",
+            error: err.message,
+          });
         });
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).json({
-          success: false,
-          message: "server Error",
-          error: err.message,
-        });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({
+        success: false,
+        message: "Server Error",
+        error: err.message,
       });
-  });
+    });
 };
 
 const gettAllComments = (req, res) => {
@@ -53,11 +71,11 @@ const getCommentsByPostId = (req, res) => {
   postModel
     .findById(postId)
     .populate({
-      path: 'comments',
-      select: 'comment',
+      path: "comments",
+      select: "comment",
       populate: {
-        path: 'commenter',
-        select: 'userName avatar',
+        path: "commenter",
+        select: "userName avatar",
       },
     })
     .then((result) => {
@@ -84,7 +102,6 @@ const getCommentsByPostId = (req, res) => {
       });
     });
 };
-
 
 const deleteCommentById = (req, res) => {
   const commentId = req.params.id;

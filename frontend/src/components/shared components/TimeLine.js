@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { userContext } from "../../App";
+import { jwtDecode } from "jwt-decode";
+import { Button } from "react-bootstrap";
 
 const TimeLine = () => {
   const [posts, setPosts] = useState([]);
   const navigate = useNavigate();
+  const [comment, setComment] = useState([]);
+  const { token } = useContext(userContext);
+  const decodedToken = jwtDecode(token);
+  const userId = decodedToken.userId;
 
   useEffect(() => {
     axios
@@ -16,6 +24,42 @@ const TimeLine = () => {
         console.log(err);
       });
   }, []);
+
+  const handleAddComment = (postId) => {
+    axios
+      .post(`http://localhost:5000/comments/${postId}/addComment`)
+      .then((result) => {
+        console.log("postId", postId);
+      })
+      .catch((err) => {
+        console.log("postId", postId);
+        console.log(err);
+      });
+  };
+
+  const handleFollowUser = (followedUserId) => {
+    axios
+      .post("http://localhost:5000/users/follow", { followedUser: followedUserId }, { headers: { Authorization: `Bearer ${token}` } })
+      .then((response) => {
+        console.log(response.data.message);
+        
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  const handleUnfollowUser = (followedUserId) => {
+    axios
+      .post("http://localhost:5000/users/unfollow", { followedUser: followedUserId }, { headers: { Authorization: `Bearer ${token}` } })
+      .then((response) => {
+        console.log(response.data.message);
+        
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
   return (
     <div className="container mt-4">
@@ -37,7 +81,32 @@ const TimeLine = () => {
                         objectFit: "cover",
                       }}
                     />
-                    <h5 className="ms-3 mb-0">{post.author.userName}</h5>
+                    <h5
+                      onClick={() => {
+                        navigate(`/dashboard/${post.author._id}`);
+                      }}
+                      style={{ cursor: "pointer", color: "blue" }}
+                      className="ms-3 mb-0"
+                    >
+                      {post.author.userName}
+                    </h5>
+                   
+                    {post.author._id !== userId && (
+                      <div>
+                        <Button
+                          variant="primary"
+                          onClick={() => handleFollowUser(post.author._id)}
+                        >
+                          Follow
+                        </Button>
+                        <Button
+                          variant="danger"
+                          onClick={() => handleUnfollowUser(post.author._id)}
+                        >
+                          Unfollow
+                        </Button>
+                      </div>
+                    )}
                   </div>
                   <p className="card-text">{post.content}</p>
                 </div>
@@ -46,9 +115,9 @@ const TimeLine = () => {
                   <small>
                     {post.comments.length > 0 ? (
                       post.comments.map((comment, index) => (
-                        <p>
+                        <p key={index}>
                           <strong>{comment.commenter.userName}</strong>
-                          <br></br>
+                          <br />
                           {comment.comment}
                         </p>
                       ))
@@ -56,7 +125,20 @@ const TimeLine = () => {
                       <small>No comments</small>
                     )}
                   </small>
+                  <input
+                    onChange={(e) => {
+                      setComment(e.target.value);
+                    }}
+                  />
+                  <button
+                    onClick={() => {
+                      handleAddComment(post._id);
+                    }}
+                  >
+                    Add comment
+                  </button>
                 </div>
+                <span>{post.likes.length} Likes</span>
               </div>
             </div>
           ))

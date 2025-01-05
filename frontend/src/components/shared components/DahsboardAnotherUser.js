@@ -2,24 +2,25 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { userContext } from "../../App";
 import { useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "bootstrap/dist/css/bootstrap.min.css"; 
 
-const Dashboard = () => {
+const DashboardAnotherUser = () => {
   const { token } = useContext(userContext);
   const decodedToken = jwtDecode(token);
   const userId = decodedToken.userId;
   const [user, setUser] = useState({});
   const [posts, setPosts] = useState([]);
-  const navigate = useNavigate(); 
+  const { id } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/users/${userId}`)
+      .get(`http://localhost:5000/users/${id}`)
       .then((response) => {
         setUser(response.data.user);
-        return axios.get(`http://localhost:5000/posts/user/${userId}`);
+        return axios.get(`http://localhost:5000/posts/user/${id}`);
       })
       .then((response) => {
         setPosts(response.data.post);
@@ -27,7 +28,11 @@ const Dashboard = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, [userId]);
+  }, [id]);
+
+  const handleNavigate = (userId) => {
+    navigate(`/dashboard/${userId}`);
+  };
 
   return (
     <div className="container mt-5">
@@ -39,21 +44,28 @@ const Dashboard = () => {
               src={user.avatar}
               alt={`${user.userName}'s avatar`}
               className="img-fluid rounded-circle"
-              style={{ width: "150px" }}
+              style={{ width: "150px", cursor: "pointer" }}
+              onClick={() => handleNavigate(user._id)}
             />
           </div>
-          <h3 className="text-center">{user.userName}</h3>
+          <h3
+            className="text-center"
+            onClick={() => handleNavigate(user._id)}
+            style={{ cursor: "pointer", color: "blue" }}
+          >
+            {user.userName}
+          </h3>
 
           <div className="row mt-4">
             <div className="col-6">
               <h4>Followers:</h4>
               <ul className="list-group">
                 {user.followers?.map((follower) => (
-                  <li 
-                    key={follower._id} 
-                    className="list-group-item d-flex align-items-center" 
-                    onClick={() => navigate(`/dashboard/${follower._id}`)} 
+                  <li
+                    key={follower._id}
+                    className="list-group-item d-flex align-items-center"
                     style={{ cursor: "pointer" }}
+                    onClick={() => handleNavigate(follower._id)}
                   >
                     <img
                       src={follower.avatar}
@@ -71,11 +83,11 @@ const Dashboard = () => {
               <h4>Following:</h4>
               <ul className="list-group">
                 {user.following?.map((following) => (
-                  <li 
-                    key={following._id} 
-                    className="list-group-item d-flex align-items-center" 
-                    onClick={() => navigate(`/dashboard/${following._id}`)} 
+                  <li
+                    key={following._id}
+                    className="list-group-item d-flex align-items-center"
                     style={{ cursor: "pointer" }}
+                    onClick={() => handleNavigate(following._id)}
                   >
                     <img
                       src={following.avatar}
@@ -107,4 +119,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default DashboardAnotherUser;
