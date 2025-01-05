@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { userContext } from "../../App";
 import { jwtDecode } from "jwt-decode";
-import { Button } from "react-bootstrap";
+import { Button, Card, Col, Row } from "react-bootstrap";
 
 const TimeLine = () => {
   const [posts, setPosts] = useState([]);
@@ -42,7 +42,6 @@ const TimeLine = () => {
       .post("http://localhost:5000/users/follow", { followedUser: followedUserId }, { headers: { Authorization: `Bearer ${token}` } })
       .then((response) => {
         console.log(response.data.message);
-        
       })
       .catch((error) => {
         console.error(error);
@@ -54,7 +53,6 @@ const TimeLine = () => {
       .post("http://localhost:5000/users/unfollow", { followedUser: followedUserId }, { headers: { Authorization: `Bearer ${token}` } })
       .then((response) => {
         console.log(response.data.message);
-        
       })
       .catch((error) => {
         console.error(error);
@@ -64,12 +62,12 @@ const TimeLine = () => {
   return (
     <div className="container mt-4">
       <h2 className="mb-4 text-center">TimeLine</h2>
-      <div className="row">
+      <Row>
         {posts.length > 0 ? (
           posts.map((post, index) => (
-            <div key={index} className="col-md-6 col-lg-4 mb-4">
-              <div className="card h-100 shadow-sm">
-                <div className="card-body">
+            <Col key={index} md={6} lg={4} className="mb-4">
+              <Card className="h-100 shadow-sm">
+                <Card.Body>
                   <div className="d-flex align-items-center mb-3">
                     <img
                       src={post.author.avatar}
@@ -85,22 +83,24 @@ const TimeLine = () => {
                       onClick={() => {
                         navigate(`/dashboard/${post.author._id}`);
                       }}
-                      style={{ cursor: "pointer", color: "blue" }}
+                      style={{ cursor: "pointer", color: "#007bff" }}
                       className="ms-3 mb-0"
                     >
                       {post.author.userName}
                     </h5>
-                   
                     {post.author._id !== userId && (
                       <div>
                         <Button
                           variant="primary"
+                          size="sm"
+                          className="me-2"
                           onClick={() => handleFollowUser(post.author._id)}
                         >
                           Follow
                         </Button>
                         <Button
                           variant="danger"
+                          size="sm"
                           onClick={() => handleUnfollowUser(post.author._id)}
                         >
                           Unfollow
@@ -109,43 +109,49 @@ const TimeLine = () => {
                     )}
                   </div>
                   <p className="card-text">{post.content}</p>
-                </div>
-
-                <div className="card-footer text-muted mt-2">
-                  <small>
-                    {post.comments.length > 0 ? (
-                      post.comments.map((comment, index) => (
-                        <p key={index}>
-                          <strong>{comment.commenter.userName}</strong>
-                          <br />
-                          {comment.comment}
-                        </p>
-                      ))
-                    ) : (
-                      <small>No comments</small>
-                    )}
-                  </small>
-                  <input
-                    onChange={(e) => {
-                      setComment(e.target.value);
-                    }}
-                  />
-                  <button
-                    onClick={() => {
-                      handleAddComment(post._id);
-                    }}
-                  >
-                    Add comment
-                  </button>
-                </div>
-                <span>{post.likes.length} Likes</span>
-              </div>
-            </div>
+                </Card.Body>
+                <Card.Footer className="text-muted">
+                  <div className="d-flex justify-content-between">
+                    <small>
+                      {post.comments.length > 0 ? (
+                        post.comments.map((comment, index) => (
+                          <p key={index}>
+                            <strong>{comment.commenter.userName}</strong>
+                            <br />
+                            {comment.comment}
+                          </p>
+                        ))
+                      ) : (
+                        <small>No comments</small>
+                      )}
+                    </small>
+                    <small>{post.likes.length} Likes</small>
+                  </div>
+                  <div className="mt-2">
+                    <input
+                      className="form-control form-control-sm"
+                      placeholder="Add a comment"
+                      onChange={(e) => {
+                        setComment(e.target.value);
+                      }}
+                    />
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="mt-2 w-100"
+                      onClick={() => handleAddComment(post._id)}
+                    >
+                      Add comment
+                    </Button>
+                  </div>
+                </Card.Footer>
+              </Card>
+            </Col>
           ))
         ) : (
           <p className="text-center">No posts available</p>
         )}
-      </div>
+      </Row>
     </div>
   );
 };

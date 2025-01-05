@@ -5,6 +5,7 @@ import { useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "bootstrap/dist/css/bootstrap.min.css"; 
+import { Button } from "react-bootstrap";
 
 const DashboardAnotherUser = () => {
   const { token } = useContext(userContext);
@@ -12,6 +13,7 @@ const DashboardAnotherUser = () => {
   const userId = decodedToken.userId;
   const [user, setUser] = useState({});
   const [posts, setPosts] = useState([]);
+  const [isFollowed, setIsFollowed] = useState(false);  
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -20,6 +22,8 @@ const DashboardAnotherUser = () => {
       .get(`http://localhost:5000/users/${id}`)
       .then((response) => {
         setUser(response.data.user);
+        
+        setIsFollowed(response.data.user.followers.some(follower => follower._id === userId));
         return axios.get(`http://localhost:5000/posts/user/${id}`);
       })
       .then((response) => {
@@ -28,10 +32,50 @@ const DashboardAnotherUser = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, [id]);
+  }, [id, userId]);
 
   const handleNavigate = (userId) => {
     navigate(`/dashboard/${userId}`);
+  };
+
+  const handleFollowUser = () => {
+    axios
+      .post("http://localhost:5000/users/follow", { followedUser: id }, { headers: { Authorization: `Bearer ${token}` } })
+      .then((response) => {
+        setIsFollowed(true);
+     
+        axios
+          .get(`http://localhost:5000/users/${id}`)
+          .then((updatedResponse) => {
+            setUser(updatedResponse.data.user);
+          })
+          .catch((error) => {
+            console.error("Error fetching updated user:", error);
+          });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  const handleUnfollowUser = () => {
+    axios
+      .post("http://localhost:5000/users/unfollow", { followedUser: id }, { headers: { Authorization: `Bearer ${token}` } })
+      .then((response) => {
+        setIsFollowed(false);
+        
+        axios
+          .get(`http://localhost:5000/users/${id}`)
+          .then((updatedResponse) => {
+            setUser(updatedResponse.data.user);
+          })
+          .catch((error) => {
+            console.error("Error fetching updated user:", error);
+          });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   return (
@@ -55,6 +99,18 @@ const DashboardAnotherUser = () => {
           >
             {user.userName}
           </h3>
+
+          
+          {userId !== id && (
+            <div className="d-flex justify-content-center my-3">
+              <Button
+                variant={isFollowed ? "danger" : "primary"}
+                onClick={isFollowed ? handleUnfollowUser : handleFollowUser}
+              >
+                {isFollowed ? "Unfollow" : "Follow"}
+              </Button>
+            </div>
+          )}
 
           <div className="row mt-4">
             <div className="col-6">
