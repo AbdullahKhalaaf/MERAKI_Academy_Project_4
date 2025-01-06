@@ -3,112 +3,91 @@ const likeModel = require("../models/likeSchema");
 const postModel = require("../models/postSchema");
 
 const createNewLike = (req, res) => {
-  const { postId, userId } = req.body;
+  const { userId, postId } = req.body;
 
-  const newLike = new likeModel({ postId, userId });
+  console.log("params", req.params);
 
-  newLike
-    .save()
-    .then((newL) => {
-      postModel
-        .findById(postId)
-        .then((post) => {
-          if (!post) {
-            // Return here to prevent further execution
-            return res.status(404).json({
-              success: false,
-              message: "Post not found",
-            });
-          }
+  const newLike = new likeModel({ userId, postId });
 
-          post.likes.push(newL._id);
-          return post.save().then(() => {
-            // Send success response after post is updated
-            res.status(201).json({
-              success: true,
-              message: "Like added successfully",
-            });
+  newLike.save().then((newL) => {
+    postModel
+      .findById(postId)
+      .then((post) => {
+        console.log("post", post);
+
+        if (!post) {
+          return res.status(404).json({
+            success: false,
+            message: "Post not found",
           });
-        })
-        .catch((err) => {
-          // Catch block for finding the post or saving the post
-          console.error(err);
+        }
 
-          // Send error response only if it hasn't been sent
-          if (!res.headersSent) {
-            res.status(500).json({
-              success: false,
-              message: "Server Error",
-              error: err.message,
-            });
-          }
+        post.likes.push(newL._id);
+        return post.save().then(() => {
+          res.status(201).json({
+            success: true,
+            message: "Like added successfully",
+          });
         });
-    })
-    .catch((err) => {
-      // Catch block for saving the new like
-      console.error(err);
-
-      // Send error response only if it hasn't been sent
-      if (!res.headersSent) {
+      })
+      .catch((err) => {
         res.status(500).json({
           success: false,
-          message: "Error adding like",
+          message: "server error",
           error: err.message,
         });
-      }
-    });
+      })
+      .catch((err) => {
+        res.status(500).json({
+          success: false,
+          message: "Error Adding like",
+          error: err.message,
+        });
+      });
+  });
 };
 
-const deleteLikeByUserAndPost = (req, res) => {
-  const { postId, userId } = req.body;
+
+const deleteLikeById = (req, res) => {
+  const { postId, userId } = req.body; 
 
   likeModel
-    .findOneAndDelete({ postId: postId, userId: userId })
-    .then((result) => {
-      if (!result) {
+    .findOneAndDelete({ postId, userId })
+    .then((like) => {
+      if (!like) {
         return res.status(404).json({
           success: false,
-          message: `No like found for Post ID ${postId} by User ID ${userId}`,
+          message: "Like not found",
         });
       }
-
       postModel
         .findById(postId)
         .then((post) => {
-          if (!post) {
-            return res.status(404).json({
-              success: false,
-              message: "Post not found",
-            });
+          if (post) {
+            post.likes = post.likes.filter((likeId) => likeId !== like._id);
+            post.save()
+              .then(() => {
+                res.status(200).json({
+                  success: true,
+                  message: "Like removed successfully",
+                });
+              })
+              .catch((err) => {
+                console.error(err);
+                res.status(500).json({ message: "Error saving post", error: err });
+              });
           }
-
-          post.likes = post.likes.filter(
-            (likeId) => likeId.toString() !== result._id.toString()
-          );
-
-          return post.save();
-        })
-        .then(() => {
-          res.status(200).json({
-            success: true,
-            message: "The Like deleted successfully",
-          });
         })
         .catch((err) => {
-          res.status(500).json({
-            success: false,
-            message: "Server Error",
-            error: err.message,
-          });
+          console.error(err);
+          res.status(500).json({ message: "Error updating post", error: err });
         });
     })
     .catch((err) => {
-      res.status(500).json({
-        success: false,
-        message: "Server Error",
-        error: err.message,
-      });
+      console.error(err);
+      res.status(500).json({ message: "Error deleting like", error: err });
     });
 };
 
-module.exports = { createNewLike, deleteLikeByUserAndPost };
+
+module.exports = { createNewLike, deleteLikeById  };

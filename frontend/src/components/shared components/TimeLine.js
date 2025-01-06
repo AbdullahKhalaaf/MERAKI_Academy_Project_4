@@ -13,6 +13,7 @@ const TimeLine = () => {
   const { token } = useContext(userContext);
   const decodedToken = jwtDecode(token);
   const userId = decodedToken.userId;
+  const [commenter, setCommenter] = useState(userId);
 
   useEffect(() => {
     axios
@@ -26,10 +27,16 @@ const TimeLine = () => {
   }, []);
 
   const handleAddComment = (postId) => {
+    console.log("postid", postId);
     axios
-      .post(`http://localhost:5000/comments/${postId}/addComment`)
+      .post(`http://localhost:5000/comments/${postId}/addComment`, {
+        postId,
+        commenter,
+        comment,
+      })
       .then((result) => {
-        console.log("postId", postId);
+        console.log("postId", result);
+        setCommenter(userId);
       })
       .catch((err) => {
         console.log("postId", postId);
@@ -39,7 +46,11 @@ const TimeLine = () => {
 
   const handleFollowUser = (followedUserId) => {
     axios
-      .post("http://localhost:5000/users/follow", { followedUser: followedUserId }, { headers: { Authorization: `Bearer ${token}` } })
+      .post(
+        "http://localhost:5000/users/follow",
+        { followedUser: followedUserId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
       .then((response) => {
         console.log(response.data.message);
       })
@@ -50,12 +61,58 @@ const TimeLine = () => {
 
   const handleUnfollowUser = (followedUserId) => {
     axios
-      .post("http://localhost:5000/users/unfollow", { followedUser: followedUserId }, { headers: { Authorization: `Bearer ${token}` } })
+      .post(
+        "http://localhost:5000/users/unfollow",
+        { followedUser: followedUserId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
       .then((response) => {
         console.log(response.data.message);
       })
       .catch((error) => {
         console.error(error);
+      });
+  };
+
+  const handleLike = (postId) => {
+    axios
+      .post(`http://localhost:5000/likes/${postId}/newLike`, { postId, userId })
+      .then((response) => {
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post._id === postId
+              ? { ...post, likes: [...post.likes, { userId }] }
+              : post
+          )
+        );
+        console.log("Liked successfully:", response.data);
+      })
+      .catch((error) => {
+        console.error("Error liking post:", error);
+      });
+  };
+
+  const handleUnlike = (postId) => {
+    axios
+      .delete(`http://localhost:5000/likes/deleteLike/${postId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        data: { postId, userId }, 
+      })
+      .then((response) => {
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post._id === postId
+              ? {
+                  ...post,
+                  likes: post.likes.filter((like) => like.userId !== userId), 
+                }
+              : post
+          )
+        );
+        console.log("Unliked successfully:", response.data);
+      })
+      .catch((error) => {
+        console.error("Error unliking post:", error);
       });
   };
 
@@ -116,7 +173,14 @@ const TimeLine = () => {
                       {post.comments.length > 0 ? (
                         post.comments.map((comment, index) => (
                           <p key={index}>
-                            <strong>{comment.commenter.userName}</strong>
+                            <strong
+                              style={{ cursor: "pointer", color: "#007bff" }}
+                              onClick={() => {
+                                navigate(`/dashboard/${comment.commenter._id}`);
+                              }}
+                            >
+                              {comment.commenter.userName}
+                            </strong>
                             <br />
                             {comment.comment}
                           </p>
@@ -143,6 +207,32 @@ const TimeLine = () => {
                     >
                       Add comment
                     </Button>
+
+                    <button
+                      onClick={() => {
+                        const isLiked = post.likes.some(
+                          (like) => like.userId === userId
+                        ); 
+                        if (isLiked) {
+                          handleUnlike(post._id); 
+                        } else {
+                          handleLike(post._id); 
+                        }
+                      }}
+                    >
+                      {post.likes.some((like) => like.userId === userId)
+                        ? "Unlike"
+                        : "Like"}
+                    </button>
+
+                    {console.log(post)}
+                    {/* <button
+                      onClick={() => {
+                        handleUnlike(post.likes._id);
+                      }}
+                    >
+                      unlike
+                    </button> */}
                   </div>
                 </Card.Footer>
               </Card>

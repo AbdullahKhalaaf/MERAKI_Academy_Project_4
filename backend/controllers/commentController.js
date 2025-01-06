@@ -6,6 +6,7 @@ const createNewComment = (req, res) => {
   const { postId, commenter, comment } = req.body;
 
   // if (!postId || !commenter || !comment) {
+  //   console.log("Validation Error: Missing required fields");
   //   return res.status(400).json({
   //     success: false,
   //     message: "All fields are required",
@@ -21,34 +22,37 @@ const createNewComment = (req, res) => {
         .findById(postId)
         .then((post) => {
           if (!post) {
-            return res.status(404).json({
+            console.log(`Post Not Found: postId=${postId}`);
+            res.status(404).json({
               success: false,
-              message: "Post Not Found",
+              message: `Post with ID ${postId} not found`,
             });
           }
+
           post.comments.push(newC._id);
-          return post.save();
+          post.save();
         })
         .then(() => {
+          console.log(`Comment Added Successfully: commentId=${newC._id}`);
           res.status(201).json({
             success: true,
             message: "Comment Added",
           });
         })
         .catch((err) => {
-          console.log(err);
+          console.error("Error while saving post:", err.message);
           res.status(500).json({
             success: false,
-            message: "Server Error",
+            message: "Error while updating post with the new comment",
             error: err.message,
           });
         });
     })
     .catch((err) => {
-      console.log(err);
+      console.error("Error while saving comment:", err.message);
       res.status(500).json({
         success: false,
-        message: "Server Error",
+        message: "Error while creating new comment",
         error: err.message,
       });
     });
