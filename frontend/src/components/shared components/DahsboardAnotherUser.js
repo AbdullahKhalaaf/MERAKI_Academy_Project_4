@@ -4,7 +4,7 @@ import { userContext } from "../../App";
 import { useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import "bootstrap/dist/css/bootstrap.min.css"; 
+import "bootstrap/dist/css/bootstrap.min.css";
 import { Button } from "react-bootstrap";
 
 const DashboardAnotherUser = () => {
@@ -13,7 +13,8 @@ const DashboardAnotherUser = () => {
   const userId = decodedToken.userId;
   const [user, setUser] = useState({});
   const [posts, setPosts] = useState([]);
-  const [isFollowed, setIsFollowed] = useState(false);  
+  const [comment, setComment] = useState("");
+  const [isFollowed, setIsFollowed] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -22,8 +23,11 @@ const DashboardAnotherUser = () => {
       .get(`http://localhost:5000/users/${id}`)
       .then((response) => {
         setUser(response.data.user);
-        
-        setIsFollowed(response.data.user.followers.some(follower => follower._id === userId));
+        setIsFollowed(
+          response.data.user.followers.some(
+            (follower) => follower._id === userId
+          )
+        );
         return axios.get(`http://localhost:5000/posts/user/${id}`);
       })
       .then((response) => {
@@ -40,10 +44,13 @@ const DashboardAnotherUser = () => {
 
   const handleFollowUser = () => {
     axios
-      .post("http://localhost:5000/users/follow", { followedUser: id }, { headers: { Authorization: `Bearer ${token}` } })
+      .post(
+        "http://localhost:5000/users/follow",
+        { followedUser: id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
       .then((response) => {
         setIsFollowed(true);
-     
         axios
           .get(`http://localhost:5000/users/${id}`)
           .then((updatedResponse) => {
@@ -60,10 +67,13 @@ const DashboardAnotherUser = () => {
 
   const handleUnfollowUser = () => {
     axios
-      .post("http://localhost:5000/users/unfollow", { followedUser: id }, { headers: { Authorization: `Bearer ${token}` } })
+      .post(
+        "http://localhost:5000/users/unfollow",
+        { followedUser: id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
       .then((response) => {
         setIsFollowed(false);
-        
         axios
           .get(`http://localhost:5000/users/${id}`)
           .then((updatedResponse) => {
@@ -75,6 +85,68 @@ const DashboardAnotherUser = () => {
       })
       .catch((error) => {
         console.error(error);
+      });
+  };
+
+  const handleAddComment = (postId) => {
+    axios
+      .post(`http://localhost:5000/comments/${postId}/addComment`, {
+        postId,
+        commenter: userId,
+        comment,
+      })
+      .then((result) => {
+        setComment("");
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post._id === postId
+              ? { ...post, comments: [...post.comments, result.data.comment] }
+              : post
+          )
+        );
+      })
+      .catch((err) => {
+        console.log("Error adding comment:", err);
+      });
+  };
+
+  const handleLike = (postId) => {
+    axios
+      .post(`http://localhost:5000/likes/${postId}/newLike`, { postId, userId })
+      .then((response) => {
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post._id === postId
+              ? { ...post, likes: [...post.likes, { userId }] }
+              : post
+          )
+        );
+      })
+      .catch((error) => {
+        console.error("Error liking post:", error);
+      });
+  };
+
+  const handleUnlike = (postId) => {
+    axios
+      .delete(`http://localhost:5000/likes/deleteLike/${postId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        data: { postId, userId },
+      })
+      .then((response) => {
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post._id === postId
+              ? {
+                  ...post,
+                  likes: post.likes.filter((like) => like.userId !== userId),
+                }
+              : post
+          )
+        );
+      })
+      .catch((error) => {
+        console.error("Error unliking post:", error);
       });
   };
 
@@ -100,7 +172,6 @@ const DashboardAnotherUser = () => {
             {user.userName}
           </h3>
 
-          
           {userId !== id && (
             <div className="d-flex justify-content-center my-3">
               <Button
@@ -113,59 +184,77 @@ const DashboardAnotherUser = () => {
           )}
 
           <div className="row mt-4">
-            <div className="col-6">
-              <h4>Followers:</h4>
-              <ul className="list-group">
-                {user.followers?.map((follower) => (
-                  <li
-                    key={follower._id}
-                    className="list-group-item d-flex align-items-center"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => handleNavigate(follower._id)}
-                  >
-                    <img
-                      src={follower.avatar}
-                      alt={`${follower.userName}'s avatar`}
-                      className="img-fluid rounded-circle"
-                      style={{ width: "40px", marginRight: "10px" }}
-                    />
-                    {follower.userName}
-                  </li>
-                )) || <p>No followers available.</p>}
-              </ul>
-            </div>
-
-            <div className="col-6">
-              <h4>Following:</h4>
-              <ul className="list-group">
-                {user.following?.map((following) => (
-                  <li
-                    key={following._id}
-                    className="list-group-item d-flex align-items-center"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => handleNavigate(following._id)}
-                  >
-                    <img
-                      src={following.avatar}
-                      alt={`${following.userName}'s avatar`}
-                      className="img-fluid rounded-circle"
-                      style={{ width: "40px", marginRight: "10px" }}
-                    />
-                    {following.userName}
-                  </li>
-                )) || <p>No following users.</p>}
-              </ul>
-            </div>
-          </div>
-
-          <h3 className="mt-4">Posts by {user.userName}</h3>
-          <div className="list-group">
+            <h3 className="mt-4">Posts by {user.userName}</h3>
             {posts?.map((post) => (
               <div key={post._id} className="list-group-item mb-3">
                 <p>{post.content}</p>
                 <div>
-                  <span className="badge bg-primary">{post.likes?.length} Likes</span>
+                  <span className="badge bg-primary">
+                    {post.likes?.length} Likes
+                  </span>
                 </div>
+                <div>
+                  {post.comments.length > 0 ? (
+                    post.comments.map((comment, index) => (
+                      <>
+                        <p key={index}>
+                          <strong>{comment?.commenter?.userName}</strong>:{" "}
+                          {comment.comment}
+                        </p>
+                        {console.log("comment", comment)}
+                      </>
+                    ))
+                  ) : (
+                    <p>No comments yet.</p>
+                  )}
+                </div>
+                <input
+                  className="form-control form-control-sm"
+                  placeholder="Add a comment"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                />
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="mt-2"
+                  onClick={() => handleAddComment(post._id)}
+                >
+                  Add Comment
+                </Button>
+
+                <button
+                  className={`btn ${
+                    post.likes.some((like) => like.userId === userId)
+                      ? "btn-danger"
+                      : "btn-light"
+                  } btn-sm mt-2`}
+                  onClick={() => {
+                    const isLiked = post.likes.some(
+                      (like) => like.userId === userId
+                    );
+                    if (isLiked) {
+                      handleUnlike(post._id);
+                    } else {
+                      handleLike(post._id);
+                    }
+                  }}
+                  style={{ border: "none", backgroundColor: "transparent" }}
+                >
+                  <i
+                    className={`bi bi-heart${
+                      post.likes.some((like) => like.userId === userId)
+                        ? "-fill"
+                        : ""
+                    }`}
+                    style={{
+                      fontSize: "1.5rem",
+                      color: post.likes.some((like) => like.userId === userId)
+                        ? "#e74c3c"
+                        : "#bdc3c7",
+                    }}
+                  />
+                </button>
               </div>
             )) || <p>No posts available.</p>}
           </div>

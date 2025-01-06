@@ -5,6 +5,8 @@ import { useContext } from "react";
 import { userContext } from "../../App";
 import { jwtDecode } from "jwt-decode";
 import { Button, Card, Col, Row } from "react-bootstrap";
+import 'bootstrap-icons/font/bootstrap-icons.css';
+
 
 const TimeLine = () => {
   const [posts, setPosts] = useState([]);
@@ -96,7 +98,7 @@ const TimeLine = () => {
     axios
       .delete(`http://localhost:5000/likes/deleteLike/${postId}`, {
         headers: { Authorization: `Bearer ${token}` },
-        data: { postId, userId }, 
+        data: { postId, userId },
       })
       .then((response) => {
         setPosts((prevPosts) =>
@@ -104,7 +106,7 @@ const TimeLine = () => {
             post._id === postId
               ? {
                   ...post,
-                  likes: post.likes.filter((like) => like.userId !== userId), 
+                  likes: post.likes.filter((like) => like.userId !== userId),
                 }
               : post
           )
@@ -209,20 +211,38 @@ const TimeLine = () => {
                     </Button>
 
                     <button
+                      className={`btn ${
+                        post.likes.some((like) => like.userId === userId)
+                          ? "btn-danger"
+                          : "btn-light"
+                      } btn-sm`}
                       onClick={() => {
                         const isLiked = post.likes.some(
                           (like) => like.userId === userId
-                        ); 
+                        );
                         if (isLiked) {
-                          handleUnlike(post._id); 
+                          handleUnlike(post._id);
                         } else {
-                          handleLike(post._id); 
+                          handleLike(post._id);
                         }
                       }}
+                      style={{ border: "none", backgroundColor: "transparent" }}
                     >
-                      {post.likes.some((like) => like.userId === userId)
-                        ? "Unlike"
-                        : "Like"}
+                      <i
+                        className={`bi bi-heart${
+                          post.likes.some((like) => like.userId === userId)
+                            ? "-fill"
+                            : ""
+                        }`}
+                        style={{
+                          fontSize: "1.5rem",
+                          color: post.likes.some(
+                            (like) => like.userId === userId
+                          )
+                            ? "#e74c3c"
+                            : "#bdc3c7",
+                        }}
+                      />
                     </button>
 
                     {console.log(post)}
