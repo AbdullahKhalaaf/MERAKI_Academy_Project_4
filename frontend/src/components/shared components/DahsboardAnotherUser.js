@@ -152,6 +152,13 @@ const DashboardAnotherUser = () => {
 
   return (
     <div className="container mt-5">
+      <h3
+        className="text-center"
+        onClick={() => handleNavigate(user._id)}
+        style={{ cursor: "pointer", color: "blue" }}
+      >
+        {user.userName}
+      </h3>
       {user && (
         <div>
           <h2 className="text-center mb-4">{user.userName}'s Profile</h2>
@@ -164,13 +171,6 @@ const DashboardAnotherUser = () => {
               onClick={() => handleNavigate(user._id)}
             />
           </div>
-          <h3
-            className="text-center"
-            onClick={() => handleNavigate(user._id)}
-            style={{ cursor: "pointer", color: "blue" }}
-          >
-            {user.userName}
-          </h3>
 
           {userId !== id && (
             <div className="d-flex justify-content-center my-3">
@@ -184,79 +184,125 @@ const DashboardAnotherUser = () => {
           )}
 
           <div className="row mt-4">
-            <h3 className="mt-4">Posts by {user.userName}</h3>
-            {posts?.map((post) => (
-              <div key={post._id} className="list-group-item mb-3">
-                <p>{post.content}</p>
-                <div>
-                  <span className="badge bg-primary">
-                    {post.likes?.length} Likes
-                  </span>
-                </div>
-                <div>
-                  {post.comments.length > 0 ? (
-                    post.comments.map((comment, index) => (
-                      <>
-                        <p key={index}>
-                          <strong>{comment?.commenter?.userName}</strong>:{" "}
-                          {comment.comment}
-                        </p>
-                        {console.log("comment", comment)}
-                      </>
-                    ))
-                  ) : (
-                    <p>No comments yet.</p>
-                  )}
-                </div>
-                <input
-                  className="form-control form-control-sm"
-                  placeholder="Add a comment"
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                />
-                <Button
-                  variant="primary"
-                  size="sm"
-                  className="mt-2"
-                  onClick={() => handleAddComment(post._id)}
-                >
-                  Add Comment
-                </Button>
+            <div className="col-6">
+              <h4>Followers:</h4>
+              <ul className="list-group">
+                {user.followers?.map((follower) => (
+                  <li
+                    key={follower._id}
+                    className="list-group-item d-flex align-items-center"
+                    onClick={() => navigate(`/dashboard/${follower._id}`)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <img
+                      src={follower.avatar}
+                      alt={`${follower.userName}'s avatar`}
+                      className="img-fluid rounded-circle"
+                      style={{ width: "40px", marginRight: "10px" }}
+                    />
+                    {follower.userName}
+                  </li>
+                )) || <p>No followers available.</p>}
+              </ul>
+            </div>
 
-                <button
-                  className={`btn ${
-                    post.likes.some((like) => like.userId === userId)
-                      ? "btn-danger"
-                      : "btn-light"
-                  } btn-sm mt-2`}
-                  onClick={() => {
-                    const isLiked = post.likes.some(
-                      (like) => like.userId === userId
-                    );
-                    if (isLiked) {
-                      handleUnlike(post._id);
-                    } else {
-                      handleLike(post._id);
-                    }
-                  }}
-                  style={{ border: "none", backgroundColor: "transparent" }}
-                >
-                  <i
-                    className={`bi bi-heart${
-                      post.likes.some((like) => like.userId === userId)
-                        ? "-fill"
-                        : ""
-                    }`}
-                    style={{
-                      fontSize: "1.5rem",
-                      color: post.likes.some((like) => like.userId === userId)
-                        ? "#e74c3c"
-                        : "#bdc3c7",
-                    }}
+            <div className="col-6">
+              <h4>Following:</h4>
+              <ul className="list-group">
+                {user.following?.map((following) => (
+                  <li
+                    key={following._id}
+                    className="list-group-item d-flex align-items-center"
+                    onClick={() => navigate(`/dashboard/${following._id}`)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <img
+                      src={following.avatar}
+                      alt={`${following.userName}'s avatar`}
+                      className="img-fluid rounded-circle"
+                      style={{ width: "40px", marginRight: "10px" }}
+                    />
+                    {following.userName}
+                  </li>
+                )) || <p>No following users.</p>}
+              </ul>
+            </div>
+
+            <div className="row mt-4">
+              <h3 className="mt-4">Posts by {user.userName}</h3>
+              {posts?.map((post) => (
+                <div key={post._id} className="list-group-item mb-3">
+                  <p>{post.content}</p>
+                  <div>
+                    <span className="badge bg-primary">
+                      {post.likes?.length} Likes
+                    </span>
+                  </div>
+                  <div>
+                    {post.comments.length > 0 ? (
+                      post.comments.map((comment, index) => (
+                        <>
+                          <p key={index}>
+                            <strong>{comment?.commenter?.userName}</strong>:{" "}
+                            {comment.comment}
+                          </p>
+                          {console.log("comment", comment)}
+                        </>
+                      ))
+                    ) : (
+                      <p>No comments yet.</p>
+                    )}
+                  </div>
+                  <input
+                    className="form-control form-control-sm"
+                    placeholder="Add a comment"
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
                   />
-                </button>
-              </div>
-            )) || <p>No posts available.</p>}
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => handleAddComment(post._id)}
+                  >
+                    Add Comment
+                  </Button>
+
+                  <button
+                    className={`btn ${
+                      post.likes.some((like) => like.userId === userId)
+                        ? "btn-danger"
+                        : "btn-light"
+                    } btn-sm mt-2`}
+                    onClick={() => {
+                      const isLiked = post.likes.some(
+                        (like) => like.userId === userId
+                      );
+                      if (isLiked) {
+                        handleUnlike(post._id);
+                      } else {
+                        handleLike(post._id);
+                      }
+                    }}
+                    style={{ border: "none", backgroundColor: "transparent" }}
+                  >
+                    <i
+                      className={`bi bi-heart${
+                        post.likes.some((like) => like.userId === userId)
+                          ? "-fill"
+                          : ""
+                      }`}
+                      style={{
+                        fontSize: "1.5rem",
+                        color: post.likes.some((like) => like.userId === userId)
+                          ? "#e74c3c"
+                          : "#bdc3c7",
+                      }}
+                    />
+                  </button>
+                </div>
+              )) || <p>No posts available.</p>}
+            </div>
           </div>
         </div>
       )}

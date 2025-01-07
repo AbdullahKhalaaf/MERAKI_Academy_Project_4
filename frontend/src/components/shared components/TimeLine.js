@@ -1,31 +1,34 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
 import { userContext } from "../../App";
 import { jwtDecode } from "jwt-decode";
-import { Button, Card, Col, Row, Form } from "react-bootstrap";
+import { Button, Card, Col, Row, Form, Spinner } from "react-bootstrap";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 const TimeLine = () => {
   const [posts, setPosts] = useState([]);
-  const navigate = useNavigate();
-  const [comment, setComment] = useState([]);
+  const [comment, setComment] = useState("");
   const [newPostContent, setNewPostContent] = useState("");
   const [newPostImage, setNewPostImage] = useState("");
   const { token } = useContext(userContext);
   const decodedToken = jwtDecode(token);
   const userId = decodedToken.userId;
   const [commenter, setCommenter] = useState(userId);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
       .get("http://localhost:5000/posts")
       .then((result) => {
         setPosts(result.data.posts);
+        setIsLoading(false);
       })
       .catch((err) => {
-        console.log(err);
+        console.log("Error fetching posts:", err);
+        setIsLoading(false);
       });
   }, []);
 
@@ -46,12 +49,31 @@ const TimeLine = () => {
         setNewPostImage("");
       })
       .catch((err) => {
-        console.log("Error Creating Post : ", err);
+        console.log("Error creating post:", err);
       });
   };
 
+  const handleCloudinaryUpload = () => {
+    window.cloudinary.openUploadWidget(
+      {
+        cloudName: "dz8ocq0ki",
+        uploadPreset: "ml_default",
+        sources: ["local", "url", "camera"],
+        showAdvancedOptions: true,
+        cropping: true,
+        multiple: false,
+        defaultSource: "local",
+      },
+      (error, result) => {
+        if (result && result.event === "success") {
+          setNewPostImage(result.info.secure_url);
+          console.log("Image uploaded:", result.info.secure_url);
+        }
+      }
+    );
+  };
+
   const handleAddComment = (postId) => {
-    console.log("postid", postId);
     axios
       .post(`http://localhost:5000/comments/${postId}/addComment`, {
         postId,
@@ -59,12 +81,11 @@ const TimeLine = () => {
         comment,
       })
       .then((result) => {
-        console.log("postId", result);
-        setCommenter(userId);
+        console.log("Comment added:", result);
+        setComment("");
       })
       .catch((err) => {
-        console.log("postId", postId);
-        console.log(err);
+        console.log("Error adding comment:", err);
       });
   };
 
@@ -140,45 +161,88 @@ const TimeLine = () => {
       });
   };
 
+  if (isLoading) {
+    return (
+      <div className="text-center mt-5">
+        <Spinner animation="border" variant="primary" />
+      </div>
+    );
+  }
+
   return (
     <div className="container mt-4">
       <h2 className="mb-4 text-center">TimeLine</h2>
-  
-      
-      <Form className="mb-4">
-        <Form.Group className="mb-2">
+
+      <Form className="mb-4 border p-4 rounded shadow-sm bg-light">
+        <h5 className="mb-3">Create a New Post</h5>
+
+        <Form.Group className="mb-3">
           <Form.Control
             type="text"
             placeholder="What's on your mind?"
             value={newPostContent}
             onChange={(e) => setNewPostContent(e.target.value)}
+            style={{
+              borderRadius: "8px",
+              padding: "10px",
+              fontSize: "1.1rem",
+              boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+            }}
           />
         </Form.Group>
-        <Form.Group className="mb-2">
-          <Form.Control
-            type="text"
-            placeholder="Image URL (optional)"
-            value={newPostImage}
-            onChange={(e) => setNewPostImage(e.target.value)}
-          />
-        </Form.Group>
-        <Button
-          variant="primary"
-          onClick={handleAddPost}
-          disabled={!newPostContent}
-        >
-          Post
-        </Button>
+
+        
+        {newPostImage && (
+          <div className="mb-3">
+            <img
+              src={newPostImage}
+              alt="Selected Preview"
+              style={{
+                width: "100px", 
+                height: "auto", 
+                objectFit: "cover",
+                borderRadius: "8px",
+                boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+              }}
+            />
+          </div>
+        )}
+
+        <div className="d-flex justify-content-between align-items-center">
+          <Button
+            variant="primary"
+            onClick={handleAddPost}
+            disabled={!newPostContent}
+            style={{
+              padding: "10px 20px",
+              fontSize: "1rem",
+              borderRadius: "8px",
+              boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            Post
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={handleCloudinaryUpload}
+            style={{
+              padding: "10px 20px",
+              fontSize: "1rem",
+              borderRadius: "8px",
+              boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            Upload Image
+          </Button>
+        </div>
       </Form>
-  
-      
+
       <Row>
         {posts.length > 0 ? (
           posts.map((post, index) => (
             <Col key={index} md={6} lg={4} className="mb-4">
               <Card className="h-100 shadow-sm">
                 <Card.Body>
-                 
                   <div className="d-flex align-items-center mb-3">
                     <img
                       src={post.author.avatar}
@@ -219,11 +283,9 @@ const TimeLine = () => {
                       </div>
                     )}
                   </div>
-  
-                  
+
                   <p className="card-text">{post.content}</p>
-  
-                  
+
                   <div className="post-images mb-3">
                     {post.images && post.images.length > 0 ? (
                       post.images.map((image, index) => (
@@ -240,12 +302,11 @@ const TimeLine = () => {
                         />
                       ))
                     ) : (
-                      <small>No images</small>
+                      <small></small>
                     )}
                   </div>
                 </Card.Body>
-  
-                
+
                 <Card.Footer className="text-muted">
                   <div className="d-flex justify-content-between">
                     <small>
@@ -274,9 +335,8 @@ const TimeLine = () => {
                     <input
                       className="form-control form-control-sm"
                       placeholder="Add a comment"
-                      onChange={(e) => {
-                        setComment(e.target.value);
-                      }}
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
                     />
                     <Button
                       variant="primary"
@@ -286,7 +346,7 @@ const TimeLine = () => {
                     >
                       Add comment
                     </Button>
-  
+
                     <button
                       className={`btn ${
                         post.likes.some((like) => like.userId === userId)
@@ -332,7 +392,6 @@ const TimeLine = () => {
       </Row>
     </div>
   );
-  
 };
 
 export default TimeLine;
