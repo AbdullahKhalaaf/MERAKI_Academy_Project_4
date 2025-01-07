@@ -3,15 +3,15 @@ const postModel = require("../models/postSchema");
 const { post } = require("../routes/userRouter");
 
 const createPost = (req, res) => {
-  const { content, author, comments, likes } = req.body;
+  const { content, author, comments, likes, images } = req.body;
 
   const newPost = new postModel({
     content,
     author,
     comments,
     likes,
+    images,
   });
-
   newPost
     .save()
     .then((result) => {
@@ -23,6 +23,7 @@ const createPost = (req, res) => {
         post: {
           content: result.content,
           author: result.author,
+          images: result.images,
         },
       });
     })
@@ -45,11 +46,11 @@ const getAllPosts = (req, res) => {
     })
     .populate("likes")
     .populate({
-      path: "comments", 
-      populate: { 
-        path: "commenter", 
-        select: "userName avatar" 
-      }
+      path: "comments",
+      populate: {
+        path: "commenter",
+        select: "userName avatar",
+      },
     })
     .then((result) => {
       res.status(200).json({
