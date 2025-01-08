@@ -42,7 +42,7 @@ const getAllPosts = (req, res) => {
     .find({})
     .populate({
       path: "author",
-      select: "userName",
+      select: "userName avatar",
     })
     .populate("likes")
     .populate({

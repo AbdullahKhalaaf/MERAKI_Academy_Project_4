@@ -76,7 +76,7 @@ const getCommentsByPostId = (req, res) => {
     .findById(postId)
     .populate({
       path: "comments",
-      select: "comment",
+      select: "comment commenter",
       populate: {
         path: "commenter",
         select: "userName avatar",

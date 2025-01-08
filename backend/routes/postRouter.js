@@ -12,7 +12,7 @@ const authentication = require("../middleware/authentication");
 
 postRouter.post("/create",authentication, createPost);
 postRouter.get("/", getAllPosts);
-postRouter.delete("/deletePost/:id", authentication, deletePostById);
+postRouter.delete("/deletePost/:id",  deletePostById);
 postRouter.get("/:id", getPostById);
 postRouter.get("/user/:id", getPostByUserId);
 postRouter.put("/:id/update", authentication, updatePostById);

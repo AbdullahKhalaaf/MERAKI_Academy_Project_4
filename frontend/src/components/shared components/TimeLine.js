@@ -30,7 +30,30 @@ const TimeLine = () => {
         console.log("Error fetching posts:", err);
         setIsLoading(false);
       });
-  }, []);
+  }, [posts, comment, commenter]);
+
+  const handleDeletePost = (postId) => {
+    axios
+      .delete(`http://localhost:5000/posts/deletePost/${postId}`)
+      .then((response) => {
+        console.log("post Deleted", response);
+        setPosts((prevPosts) => {
+          prevPosts.filter((post) => post._id !== postId);
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const handleDeleteComment = (commentId,postId)=>{
+    axios.delete(`http://localhost:5000/comments/${commentId}`)
+    .then((response)=>{
+      console.log("Comment Deleted:", response);
+      setComment
+      
+    })
+  }
 
   const handleAddPost = () => {
     axios
@@ -44,7 +67,29 @@ const TimeLine = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       )
       .then((response) => {
-        setPosts((prevPosts) => [response.data.post, ...prevPosts]);
+        console.log(response.data.post);
+        console.log(
+          "response.data.post.author.userName",
+          response.data.post.author
+        );
+        console.log(
+          "response.data.post.author.avatar",
+          response.data.post.author
+        );
+
+        setPosts((prevPosts) => [
+          {
+            ...response.data.post,
+            author: {
+              userName: response.data.post.author.userName,
+              avatar: response.data.post.author.avatar,
+            },
+            comments: response.data.post.comments || [],
+            likes: response.data.post.likes || [],
+          },
+          ...prevPosts,
+        ]);
+
         setNewPostContent("");
         setNewPostImage("");
       })
@@ -82,6 +127,13 @@ const TimeLine = () => {
       })
       .then((result) => {
         console.log("Comment added:", result);
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post._id === postId
+              ? { ...post, comments: [...post.comments, result.data.comment] }
+              : post
+          )
+        );
         setComment("");
       })
       .catch((err) => {
@@ -137,6 +189,8 @@ const TimeLine = () => {
       });
   };
 
+
+
   const handleUnlike = (postId) => {
     axios
       .delete(`http://localhost:5000/likes/deleteLike/${postId}`, {
@@ -191,15 +245,14 @@ const TimeLine = () => {
           />
         </Form.Group>
 
-        
         {newPostImage && (
           <div className="mb-3">
             <img
               src={newPostImage}
               alt="Selected Preview"
               style={{
-                width: "100px", 
-                height: "auto", 
+                width: "100px",
+                height: "auto",
                 objectFit: "cover",
                 borderRadius: "8px",
                 boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
@@ -238,7 +291,7 @@ const TimeLine = () => {
       </Form>
 
       <Row>
-        {posts.length > 0 ? (
+        {posts?.length > 0 ? (
           posts.map((post, index) => (
             <Col key={index} md={6} lg={4} className="mb-4">
               <Card className="h-100 shadow-sm">
@@ -263,6 +316,14 @@ const TimeLine = () => {
                     >
                       {post.author.userName}
                     </h5>
+                    <Button
+                      variant="danger"
+                      onClick={() => {
+                        handleDeletePost(post._id);
+                      }}
+                    >
+                      DeletePost
+                    </Button>
                     {post.author._id !== userId && (
                       <div>
                         <Button
@@ -287,7 +348,7 @@ const TimeLine = () => {
                   <p className="card-text">{post.content}</p>
 
                   <div className="post-images mb-3">
-                    {post.images && post.images.length > 0 ? (
+                    {post.images && post.images?.length > 0 ? (
                       post.images.map((image, index) => (
                         <img
                           key={index}
@@ -319,17 +380,17 @@ const TimeLine = () => {
                                 navigate(`/dashboard/${comment.commenter._id}`);
                               }}
                             >
-                              {comment.commenter.userName}
+                              {comment?.commenter?.userName}
                             </strong>
                             <br />
-                            {comment.comment}
+                            {comment?.comment}
                           </p>
                         ))
                       ) : (
                         <small>No comments</small>
                       )}
                     </small>
-                    <small>{post.likes.length} Likes</small>
+                    <small>{post.likes?.length} Likes</small>
                   </div>
                   <div className="mt-2">
                     <input
@@ -349,12 +410,12 @@ const TimeLine = () => {
 
                     <button
                       className={`btn ${
-                        post.likes.some((like) => like.userId === userId)
+                        post.likes?.some((like) => like.userId === userId)
                           ? "btn-danger"
                           : "btn-light"
                       } btn-sm`}
                       onClick={() => {
-                        const isLiked = post.likes.some(
+                        const isLiked = post.likes?.some(
                           (like) => like.userId === userId
                         );
                         if (isLiked) {
@@ -367,13 +428,13 @@ const TimeLine = () => {
                     >
                       <i
                         className={`bi bi-heart${
-                          post.likes.some((like) => like.userId === userId)
+                          post.likes?.some((like) => like.userId === userId)
                             ? "-fill"
                             : ""
                         }`}
                         style={{
                           fontSize: "1.5rem",
-                          color: post.likes.some(
+                          color: post.likes?.some(
                             (like) => like.userId === userId
                           )
                             ? "#e74c3c"
