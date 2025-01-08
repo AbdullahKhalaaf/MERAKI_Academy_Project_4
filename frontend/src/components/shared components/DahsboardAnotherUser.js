@@ -17,6 +17,8 @@ const DashboardAnotherUser = () => {
   const [isFollowed, setIsFollowed] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
+  const [editPostContent, setEditPostContent] = useState("");
+  const [newComment, setNewComment] = useState("");
 
   useEffect(() => {
     axios
@@ -36,7 +38,32 @@ const DashboardAnotherUser = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, [id, userId]);
+  }, [id, userId, posts, comment]);
+  const handleUpdateComment = (commenId, postId) => {
+    axios
+      .put(`http://localhost:5000/comments/update/${commenId}`, {
+        comment: newComment,
+      })
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const handleUpdatePost = (postId) => {
+    axios
+      .put(`http://localhost:5000/posts/${postId}/update`, {
+        content: editPostContent,
+      })
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   const handleNavigate = (userId) => {
     navigate(`/dashboard/${userId}`);
@@ -290,14 +317,55 @@ const DashboardAnotherUser = () => {
                         >
                           {post.author.userName}
                         </h5>
-                        <Button
-                          variant="danger"
-                          onClick={() => {
-                            handleDeletePost(post._id);
-                          }}
-                        >
-                          Delete Post
-                        </Button>
+                        {post.author._id === userId && (
+                          <>
+                            <div
+                              className="post-edit-section"
+                              style={{
+                                marginLeft: "auto",
+                                display: "flex",
+                                alignItems: "center",
+                              }}
+                            >
+                              <button
+                                onClick={() => handleUpdatePost(post._id)}
+                                className="btn btn-warning btn-sm"
+                                style={{
+                                  marginRight: "10px",
+                                  fontSize: "1rem",
+                                }}
+                              >
+                                Edit
+                              </button>
+                              <input
+                                onChange={(e) =>
+                                  setEditPostContent(e.target.value)
+                                }
+                                placeholder="Edit your post"
+                                value={editPostContent}
+                                style={{
+                                  padding: "8px",
+                                  borderRadius: "8px",
+                                  border: "1px solid #ddd",
+                                  width: "80%",
+                                  fontSize: "1rem",
+                                  boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+                                  marginTop: "5px",
+                                }}
+                              />
+                            </div>
+                          </>
+                        )}
+                        {post.author._id === userId && (
+                          <Button
+                            variant="danger"
+                            onClick={() => {
+                              handleDeletePost(post._id);
+                            }}
+                          >
+                            Delete Post
+                          </Button>
+                        )}
                       </div>
 
                       <p className="card-text">{post.content}</p>
@@ -347,16 +415,49 @@ const DashboardAnotherUser = () => {
 
                                   {comment?.comment}
                                 </p>
-                                <Button
-                                  variant="danger"
-                                  size="sm"
-                                  className="mt-2"
-                                  onClick={() =>
-                                    handleDeleteComment(comment._id, post._id)
-                                  }
-                                >
-                                  Delete
-                                </Button>
+                                {comment.commenter._id === userId && (
+                                  <div
+                                    className="comment-edit-section"
+                                    style={{ marginTop: "10px" }}
+                                  >
+                                    <Button
+                                      onClick={() =>
+                                        handleUpdateComment(comment._id)
+                                      }
+                                      variant="warning"
+                                      size="sm"
+                                    >
+                                      Edit Comment
+                                    </Button>
+                                    <input
+                                      onChange={(e) =>
+                                        setNewComment(e.target.value)
+                                      }
+                                      value={newComment}
+                                      placeholder="Edit your comment"
+                                      style={{
+                                        padding: "8px",
+                                        borderRadius: "8px",
+                                        border: "1px solid #ddd",
+                                        width: "80%",
+                                        fontSize: "1rem",
+                                        marginTop: "5px",
+                                      }}
+                                    />
+                                  </div>
+                                )}
+                                {comment?.commenter._id === userId && (
+                                  <Button
+                                    variant="danger"
+                                    size="sm"
+                                    className="mt-2"
+                                    onClick={() =>
+                                      handleDeleteComment(comment._id, post._id)
+                                    }
+                                  >
+                                    Delete
+                                  </Button>
+                                )}
                               </>
                             ))
                           ) : (
