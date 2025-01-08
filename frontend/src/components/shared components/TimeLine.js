@@ -46,14 +46,29 @@ const TimeLine = () => {
       });
   };
 
-  const handleDeleteComment = (commentId,postId)=>{
-    axios.delete(`http://localhost:5000/comments/${commentId}`)
-    .then((response)=>{
-      console.log("Comment Deleted:", response);
-      setComment
-      
-    })
-  }
+  const handleDeleteComment = (commentId, postId) => {
+    axios
+      .delete(`http://localhost:5000/comments/${commentId}`)
+      .then((response) => {
+        console.log("comment Deleted Successfuly:", response);
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post._id === postId
+              ? {
+                  ...post,
+                  comments: post.comments.filter(
+                    (comment) => comment._id !== commentId
+                  ), 
+                }
+              : post
+          )
+        );
+      })
+
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   const handleAddPost = () => {
     axios
@@ -189,14 +204,16 @@ const TimeLine = () => {
       });
   };
 
-
-
   const handleUnlike = (postId) => {
     axios
-      .delete(`http://localhost:5000/likes/deleteLike/${postId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-        data: { postId, userId },
-      })
+      .delete(
+        `http://localhost:5000/likes/deleteLike/${postId}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          data: { postId, userId },
+        }
+      )
       .then((response) => {
         setPosts((prevPosts) =>
           prevPosts.map((post) =>
@@ -373,7 +390,7 @@ const TimeLine = () => {
                     <small>
                       {post.comments.length > 0 ? (
                         post.comments.map((comment, index) => (
-                          <p key={index}>
+                          <div key={index} className="mb-2">
                             <strong
                               style={{ cursor: "pointer", color: "#007bff" }}
                               onClick={() => {
@@ -383,8 +400,21 @@ const TimeLine = () => {
                               {comment?.commenter?.userName}
                             </strong>
                             <br />
-                            {comment?.comment}
-                          </p>
+                            
+                            <span>{comment?.comment}</span>
+
+                           
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              className="mt-2"
+                              onClick={() =>
+                                handleDeleteComment(comment._id, post._id)
+                              } 
+                            >
+                              Delete
+                            </Button>
+                          </div>
                         ))
                       ) : (
                         <small>No comments</small>

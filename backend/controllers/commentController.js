@@ -109,7 +109,7 @@ const getCommentsByPostId = (req, res) => {
 
 const deleteCommentById = (req, res) => {
   const commentId = req.params.id;
-  console.log("Token User ID:", req.token.userId);
+  
 
   commentModel
     .findByIdAndDelete(commentId)
