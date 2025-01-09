@@ -244,6 +244,35 @@ const unfollowUser = (req, res) => {
     });
 };
 
+const updateAvatar = (req, res) => {
+  const { avatar } = req.body;
+  const userId = req.params.id;
+
+  userModel
+    .findByIdAndUpdate(userId, { avatar }, { new: true })
+    .then((result) => {
+      if (!result) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+      res.status(200).json({
+        success: true,
+        message: "Avatar updated successfully",
+        result,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+
+      res.status(500).json({
+        success: false,
+        message: "Server error",
+        error: err.message,
+      });
+    });
+};
 module.exports = {
   userRegister,
   userLogin,
@@ -251,4 +280,5 @@ module.exports = {
   getUserById,
   followUser,
   unfollowUser,
+  updateAvatar,
 };

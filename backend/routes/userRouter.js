@@ -6,6 +6,7 @@ const {
   getUserById,
   followUser,
   unfollowUser,
+  updateAvatar,
 } = require("../controllers/userController");
 const authentication = require("../middleware/authentication");
 const userRouter = express.Router();
@@ -16,4 +17,5 @@ userRouter.get("/", getAllUsers);
 userRouter.get("/:id", getUserById);
 userRouter.post("/follow", authentication, followUser);
 userRouter.post("/unfollow", authentication, unfollowUser);
+userRouter.put("/updateavatar/:id", updateAvatar);
 module.exports = userRouter;
