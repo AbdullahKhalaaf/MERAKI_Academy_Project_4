@@ -415,6 +415,7 @@ const DashboardAnotherUser = () => {
 
                                   {comment?.comment}
                                 </p>
+                                {/* i want to edit this comment */}
                                 {comment.commenter._id === userId && (
                                   <div
                                     className="comment-edit-section"

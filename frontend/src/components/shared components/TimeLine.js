@@ -469,7 +469,7 @@ const TimeLine = () => {
                             <br />
 
                             <span>{comment?.comment}</span>
-                            {comment.commenter._id === userId && (
+                            {comment?.commenter._id === userId && (
                               <div
                                 className="comment-edit-section"
                                 style={{ marginTop: "10px" }}

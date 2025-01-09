@@ -20,7 +20,7 @@ const Dashboard = () => {
   const [newPostContent, setNewPostContent] = useState("");
   const [newPostImage, setNewPostImage] = useState("");
   const [editPostContent, setEditPostContent] = useState("");
-
+  const [avatar, setAvatar] = useState(null);
   useEffect(() => {
     axios
       .get(`http://localhost:5000/users/${userId}`)
@@ -87,7 +87,7 @@ const Dashboard = () => {
         sources: ["local", "url", "camera"],
         showAdvancedOptions: true,
         cropping: true,
-        multiple: false,
+        multiple: true,
         defaultSource: "local",
       },
       (error, result) => {
@@ -97,6 +97,48 @@ const Dashboard = () => {
         }
       }
     );
+  };
+  const handleCloudinaryUploadAvatar = () => {
+    window.cloudinary.openUploadWidget(
+      {
+        cloudName: "dz8ocq0ki", 
+        uploadPreset: "ml_default", 
+        sources: ["local", "url", "camera"],
+        showAdvancedOptions: true,
+        cropping: true,
+        multiple: false,
+        defaultSource: "local",
+        transformation: [
+          {
+            width: 400,
+            height: 400,
+            crop: "fill", 
+            gravity: "face", 
+          },
+        ],
+      },
+      (error, result) => {
+        if (result && result.event === "success") {
+          setAvatar(result.info.secure_url); 
+          console.log("Avatar uploaded:", result.info.secure_url);
+        }
+      }
+    );
+  };
+
+  const updateAvatar = () => {
+    if (avatar) {
+      axios
+        .put(`http://localhost:5000/users/updateavatar/${userId}`, {
+          avatar: avatar,
+        })
+        .then((result) => {
+          console.log("Avatar updated successfully:", result.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   };
   const handleDeleteComment = (commentId, postId) => {
     axios
@@ -221,6 +263,7 @@ const Dashboard = () => {
         console.error("Error unliking post:", error);
       });
   };
+  const loggedInUserId = localStorage.getItem("token");
 
   return (
     <div className="container mt-5">
@@ -234,7 +277,43 @@ const Dashboard = () => {
               className="img-fluid rounded-circle"
               style={{ width: "150px" }}
             />
+            {token === loggedInUserId && (
+              <div className="container mt-4">
+                <div className="d-flex align-items-center">
+                  
+                  <div className="avatar-section">
+                    <button
+                      className="btn btn-primary mb-3"
+                      onClick={handleCloudinaryUploadAvatar}
+                    >
+                      <i className="bi bi-upload"></i> Upload Avatar
+                    </button>
+                    {avatar && (
+                      <div className="d-flex flex-column align-items-center">
+                        <img
+                          src={avatar}
+                          alt="New Avatar"
+                          className="img-fluid rounded-circle mb-3"
+                          style={{
+                            width: "150px",
+                            height: "150px",
+                            objectFit: "cover",
+                          }}
+                        />
+                        <button
+                          className="btn btn-success"
+                          onClick={updateAvatar}
+                        >
+                          Update Avatar
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
+
           <h3 className="text-center">{user.userName}</h3>
 
           <div className="row mt-4">
@@ -364,6 +443,7 @@ const Dashboard = () => {
                             objectFit: "cover",
                           }}
                         />
+
                         <h5
                           onClick={() => {
                             navigate(`/dashboard/${post.author._id}`);
@@ -472,37 +552,37 @@ const Dashboard = () => {
 
                                   {comment?.comment}
                                 </p>
-                               {comment.commenter._id === userId && (
-                                                             <div
-                                                               className="comment-edit-section"
-                                                               style={{ marginTop: "10px" }}
-                                                             >
-                                                               <Button
-                                                                 onClick={() =>
-                                                                   handleUpdateComment(comment._id)
-                                                                 }
-                                                                 variant="warning"
-                                                                 size="sm"
-                                                               >
-                                                                 Edit Comment
-                                                               </Button>
-                                                               <input
-                                                                 onChange={(e) =>
-                                                                   setNewComment(e.target.value)
-                                                                 }
-                                                                 value={newComment}
-                                                                 placeholder="Edit your comment"
-                                                                 style={{
-                                                                   padding: "8px",
-                                                                   borderRadius: "8px",
-                                                                   border: "1px solid #ddd",
-                                                                   width: "80%",
-                                                                   fontSize: "1rem",
-                                                                   marginTop: "5px",
-                                                                 }}
-                                                               />
-                                                             </div>
-                                                           )}
+                                {comment.commenter._id === userId && (
+                                  <div
+                                    className="comment-edit-section"
+                                    style={{ marginTop: "10px" }}
+                                  >
+                                    <Button
+                                      onClick={() =>
+                                        handleUpdateComment(comment._id)
+                                      }
+                                      variant="warning"
+                                      size="sm"
+                                    >
+                                      Edit Comment
+                                    </Button>
+                                    <input
+                                      onChange={(e) =>
+                                        setNewComment(e.target.value)
+                                      }
+                                      value={newComment}
+                                      placeholder="Edit your comment"
+                                      style={{
+                                        padding: "8px",
+                                        borderRadius: "8px",
+                                        border: "1px solid #ddd",
+                                        width: "80%",
+                                        fontSize: "1rem",
+                                        marginTop: "5px",
+                                      }}
+                                    />
+                                  </div>
+                                )}
                                 {comment?.commenter._id === userId && (
                                   <Button
                                     variant="danger"
