@@ -29,37 +29,42 @@ const Login = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <h2>Login</h2>
-      <div className="mb-3">
-        <input
-          className="form-control"
-          type="email"
-          placeholder="Email"
-          onChange={(e) => {
-            setUserInfo({ ...userInfo, email: e.target.value });
+    <div
+      className="d-flex vh-100 justify-content-center align-items-center"
+      style={{ paddingTop: "70px" }} // Adjust for navbar height if needed
+    >
+      <div className="w-50 p-4 shadow-lg rounded bg-light">
+        <h2 className="text-center mb-4">Login</h2>
+        <div className="mb-3">
+          <input
+            className="form-control"
+            type="email"
+            placeholder="Email"
+            onChange={(e) => {
+              setUserInfo({ ...userInfo, email: e.target.value });
+            }}
+          />
+        </div>
+        <div className="mb-3">
+          <input
+            className="form-control"
+            type="password"
+            placeholder="Password"
+            onChange={(e) => {
+              setUserInfo({ ...userInfo, password: e.target.value });
+            }}
+          />
+        </div>
+        <button
+          className="btn btn-primary w-100"
+          onClick={() => {
+            handleLogin();
           }}
-        />
+        >
+          Login
+        </button>
+        {message && <p className="mt-3 text-danger text-center">{message}</p>}
       </div>
-      <div className="mb-3">
-        <input
-          className="form-control"
-          type="password"
-          placeholder="Password"
-          onChange={(e) => {
-            setUserInfo({ ...userInfo, password: e.target.value });
-          }}
-        />
-      </div>
-      <button
-        className="btn btn-primary"
-        onClick={() => {
-          handleLogin();
-        }}
-      >
-        Login
-      </button>
-      {message && <p className="mt-3">{message}</p>}
     </div>
   );
 };

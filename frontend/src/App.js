@@ -13,10 +13,11 @@ import DashboardAnotherUser from "./components/shared components/DahsboardAnothe
 export const userContext = createContext();
 const App = () => {
   const [token, setToken] = useState(localStorage.getItem("token"));
+  const [isFollowed,setIsFollowed] =useState(false)
 
   return (
     <>
-      <userContext.Provider value={{ token, setToken }}>
+      <userContext.Provider value={{ token, setToken,isFollowed,setIsFollowed }}>
         <div className="App">
           <Navbar />
         </div>

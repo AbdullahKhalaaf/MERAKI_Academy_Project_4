@@ -5,7 +5,7 @@ import { useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Button, Card, Col, Row, Form, Spinner } from "react-bootstrap";
+import { Button, Card, Col, Row, Form, Spinner, Modal } from "react-bootstrap";
 
 const DashboardAnotherUser = () => {
   const { token } = useContext(userContext);
@@ -19,6 +19,10 @@ const DashboardAnotherUser = () => {
   const navigate = useNavigate();
   const [editPostContent, setEditPostContent] = useState("");
   const [newComment, setNewComment] = useState("");
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
   useEffect(() => {
     axios
@@ -327,32 +331,61 @@ const DashboardAnotherUser = () => {
                                 alignItems: "center",
                               }}
                             >
-                              <button
-                                onClick={() => handleUpdatePost(post._id)}
-                                className="btn btn-warning btn-sm"
-                                style={{
-                                  marginRight: "10px",
-                                  fontSize: "1rem",
-                                }}
-                              >
-                                Edit
-                              </button>
-                              <input
-                                onChange={(e) =>
-                                  setEditPostContent(e.target.value)
-                                }
-                                placeholder="Edit your post"
-                                value={editPostContent}
-                                style={{
-                                  padding: "8px",
-                                  borderRadius: "8px",
-                                  border: "1px solid #ddd",
-                                  width: "80%",
-                                  fontSize: "1rem",
-                                  boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-                                  marginTop: "5px",
-                                }}
-                              />
+                              <>
+                                <Button
+                                  variant="primary"
+                                  className="btn btn-warning btn-sm"
+                                  style={{
+                                    marginRight: "10px",
+                                    fontSize: "1rem",
+                                  }}
+                                  onClick={handleShow}
+                                >
+                                  edit post
+                                </Button>
+                                <Modal show={show} onHide={handleClose}>
+                                  <Modal.Header closeButton>
+                                    <Modal.Title>Edit Post</Modal.Title>
+                                  </Modal.Header>
+                                  <Modal.Body>
+                                    Edit Your Post
+                                    <input
+                                      onChange={(e) =>
+                                        setEditPostContent(e.target.value)
+                                      }
+                                      placeholder="Edit your post"
+                                      value={editPostContent}
+                                      style={{
+                                        padding: "8px",
+                                        borderRadius: "8px",
+                                        border: "1px solid #ddd",
+                                        width: "80%",
+                                        fontSize: "1rem",
+                                        boxShadow:
+                                          "0 2px 5px rgba(0, 0, 0, 0.1)",
+                                        marginTop: "5px",
+                                      }}
+                                    />
+                                  </Modal.Body>
+                                  <Modal.Footer>
+                                    <Button
+                                      variant="secondary"
+                                      onClick={handleClose}
+                                    >
+                                      Cancel
+                                    </Button>
+                                    <Button
+                                      variant="primary"
+                                      onClick={() => {
+                                        handleClose();
+                                        handleUpdatePost(post._id);
+                                      }}
+                                    >
+                                      Save Changes
+                                    </Button>
+                                  </Modal.Footer>
+                                </Modal>
+                              </>
                             </div>
                           </>
                         )}
@@ -415,36 +448,64 @@ const DashboardAnotherUser = () => {
 
                                   {comment?.comment}
                                 </p>
-                                {/* i want to edit this comment */}
-                                {comment.commenter._id === userId && (
+                                {comment?.commenter._id === userId && (
                                   <div
                                     className="comment-edit-section"
                                     style={{ marginTop: "10px" }}
                                   >
-                                    <Button
-                                      onClick={() =>
-                                        handleUpdateComment(comment._id)
-                                      }
-                                      variant="warning"
-                                      size="sm"
-                                    >
-                                      Edit Comment
-                                    </Button>
-                                    <input
-                                      onChange={(e) =>
-                                        setNewComment(e.target.value)
-                                      }
-                                      value={newComment}
-                                      placeholder="Edit your comment"
-                                      style={{
-                                        padding: "8px",
-                                        borderRadius: "8px",
-                                        border: "1px solid #ddd",
-                                        width: "80%",
-                                        fontSize: "1rem",
-                                        marginTop: "5px",
-                                      }}
-                                    />
+                                    <>
+                                      <Button
+                                        variant="primary"
+                                        onClick={handleShow}
+                                      >
+                                        Edit Comment
+                                      </Button>
+                                      <Modal show={show} onHide={handleClose}>
+                                        <Modal.Header closeButton>
+                                          <Modal.Title>
+                                            Modal heading
+                                          </Modal.Title>
+                                        </Modal.Header>
+                                        <Modal.Body>
+                                          Edit your Comment
+                                          <input
+                                            onChange={(e) =>
+                                              setNewComment(e.target.value)
+                                            }
+                                            value={newComment}
+                                            placeholder="Edit your comment"
+                                            style={{
+                                              padding: "8px",
+                                              borderRadius: "8px",
+                                              border: "1px solid #ddd",
+                                              width: "80%",
+                                              fontSize: "1rem",
+                                              marginTop: "5px",
+                                            }}
+                                          />
+                                        </Modal.Body>
+
+                                        <Modal.Footer>
+                                          <Button
+                                            variant="secondary"
+                                            onClick={() => {
+                                              handleClose();
+                                            }}
+                                          >
+                                            Cancel
+                                          </Button>
+                                          <Button
+                                            variant="primary"
+                                            onClick={() => {
+                                              handleClose();
+                                              handleUpdateComment(comment._id);
+                                            }}
+                                          >
+                                            Save Changes
+                                          </Button>
+                                        </Modal.Footer>
+                                      </Modal>
+                                    </>
                                   </div>
                                 )}
                                 {comment?.commenter._id === userId && (
@@ -463,7 +524,9 @@ const DashboardAnotherUser = () => {
                             ))
                           ) : (
                             <small>No comments</small>
+                            
                           )}
+                          <small>{post.likes?.length} Likes</small>
                         </small>
                         <input
                           className="form-control form-control-sm"

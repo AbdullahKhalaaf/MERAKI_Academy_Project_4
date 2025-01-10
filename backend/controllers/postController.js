@@ -42,7 +42,7 @@ const getAllPosts = (req, res) => {
     .find({})
     .populate({
       path: "author",
-      select: "userName avatar",
+      select: "userName avatar followers",
     })
     .populate("likes")
     .populate({
@@ -52,6 +52,7 @@ const getAllPosts = (req, res) => {
         select: "userName avatar",
       },
     })
+    .sort({ createdAt: -1 })
     .then((result) => {
       res.status(200).json({
         success: true,
@@ -106,7 +107,7 @@ const getPostById = (req, res) => {
 
   postModel
     .findById(postId)
-    .populate({ path: `author`, select: `userName avatar` })
+    .populate({ path: `author`, select: `userName avatar followers` })
     .populate({
       path: `likes`,
       populate: {

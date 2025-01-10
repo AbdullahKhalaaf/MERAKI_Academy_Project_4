@@ -5,7 +5,7 @@ import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Button, Card, Col, Row, Form, Spinner } from "react-bootstrap";
+import { Button, Card, Col, Row, Form, Spinner, Modal } from "react-bootstrap";
 
 const Dashboard = () => {
   const { token } = useContext(userContext);
@@ -21,6 +21,11 @@ const Dashboard = () => {
   const [newPostImage, setNewPostImage] = useState("");
   const [editPostContent, setEditPostContent] = useState("");
   const [avatar, setAvatar] = useState(null);
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
   useEffect(() => {
     axios
       .get(`http://localhost:5000/users/${userId}`)
@@ -101,8 +106,8 @@ const Dashboard = () => {
   const handleCloudinaryUploadAvatar = () => {
     window.cloudinary.openUploadWidget(
       {
-        cloudName: "dz8ocq0ki", 
-        uploadPreset: "ml_default", 
+        cloudName: "dz8ocq0ki",
+        uploadPreset: "ml_default",
         sources: ["local", "url", "camera"],
         showAdvancedOptions: true,
         cropping: true,
@@ -112,14 +117,14 @@ const Dashboard = () => {
           {
             width: 400,
             height: 400,
-            crop: "fill", 
-            gravity: "face", 
+            crop: "fill",
+            gravity: "face",
           },
         ],
       },
       (error, result) => {
         if (result && result.event === "success") {
-          setAvatar(result.info.secure_url); 
+          setAvatar(result.info.secure_url);
           console.log("Avatar uploaded:", result.info.secure_url);
         }
       }
@@ -280,7 +285,6 @@ const Dashboard = () => {
             {token === loggedInUserId && (
               <div className="container mt-4">
                 <div className="d-flex align-items-center">
-                  
                   <div className="avatar-section">
                     <button
                       className="btn btn-primary mb-3"
@@ -463,32 +467,61 @@ const Dashboard = () => {
                                 alignItems: "center",
                               }}
                             >
-                              <button
-                                onClick={() => handleUpdatePost(post._id)}
-                                className="btn btn-warning btn-sm"
-                                style={{
-                                  marginRight: "10px",
-                                  fontSize: "1rem",
-                                }}
-                              >
-                                Edit
-                              </button>
-                              <input
-                                onChange={(e) =>
-                                  setEditPostContent(e.target.value)
-                                }
-                                placeholder="Edit your post"
-                                value={editPostContent}
-                                style={{
-                                  padding: "8px",
-                                  borderRadius: "8px",
-                                  border: "1px solid #ddd",
-                                  width: "80%",
-                                  fontSize: "1rem",
-                                  boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-                                  marginTop: "5px",
-                                }}
-                              />
+                              <>
+                                <Button
+                                  variant="primary"
+                                  className="btn btn-warning btn-sm"
+                                  style={{
+                                    marginRight: "10px",
+                                    fontSize: "1rem",
+                                  }}
+                                  onClick={handleShow}
+                                >
+                                  edit post
+                                </Button>
+                                <Modal show={show} onHide={handleClose}>
+                                  <Modal.Header closeButton>
+                                    <Modal.Title>Edit Post</Modal.Title>
+                                  </Modal.Header>
+                                  <Modal.Body>
+                                    Edit Your Post
+                                    <input
+                                      onChange={(e) =>
+                                        setEditPostContent(e.target.value)
+                                      }
+                                      placeholder="Edit your post"
+                                      value={editPostContent}
+                                      style={{
+                                        padding: "8px",
+                                        borderRadius: "8px",
+                                        border: "1px solid #ddd",
+                                        width: "80%",
+                                        fontSize: "1rem",
+                                        boxShadow:
+                                          "0 2px 5px rgba(0, 0, 0, 0.1)",
+                                        marginTop: "5px",
+                                      }}
+                                    />
+                                  </Modal.Body>
+                                  <Modal.Footer>
+                                    <Button
+                                      variant="secondary"
+                                      onClick={handleClose}
+                                    >
+                                      Cancel
+                                    </Button>
+                                    <Button
+                                      variant="primary"
+                                      onClick={() => {
+                                        handleClose();
+                                        handleUpdatePost(post._id);
+                                      }}
+                                    >
+                                      Save Changes
+                                    </Button>
+                                  </Modal.Footer>
+                                </Modal>
+                              </>
                             </div>
                           </>
                         )}
@@ -552,35 +585,64 @@ const Dashboard = () => {
 
                                   {comment?.comment}
                                 </p>
-                                {comment.commenter._id === userId && (
+                                {comment?.commenter._id === userId && (
                                   <div
                                     className="comment-edit-section"
                                     style={{ marginTop: "10px" }}
                                   >
-                                    <Button
-                                      onClick={() =>
-                                        handleUpdateComment(comment._id)
-                                      }
-                                      variant="warning"
-                                      size="sm"
-                                    >
-                                      Edit Comment
-                                    </Button>
-                                    <input
-                                      onChange={(e) =>
-                                        setNewComment(e.target.value)
-                                      }
-                                      value={newComment}
-                                      placeholder="Edit your comment"
-                                      style={{
-                                        padding: "8px",
-                                        borderRadius: "8px",
-                                        border: "1px solid #ddd",
-                                        width: "80%",
-                                        fontSize: "1rem",
-                                        marginTop: "5px",
-                                      }}
-                                    />
+                                    <>
+                                      <Button
+                                        variant="primary"
+                                        onClick={handleShow}
+                                      >
+                                        Edit Comment
+                                      </Button>
+                                      <Modal show={show} onHide={handleClose}>
+                                        <Modal.Header closeButton>
+                                          <Modal.Title>
+                                            Modal heading
+                                          </Modal.Title>
+                                        </Modal.Header>
+                                        <Modal.Body>
+                                          Edit your Comment
+                                          <input
+                                            onChange={(e) =>
+                                              setNewComment(e.target.value)
+                                            }
+                                            value={newComment}
+                                            placeholder="Edit your comment"
+                                            style={{
+                                              padding: "8px",
+                                              borderRadius: "8px",
+                                              border: "1px solid #ddd",
+                                              width: "80%",
+                                              fontSize: "1rem",
+                                              marginTop: "5px",
+                                            }}
+                                          />
+                                        </Modal.Body>
+
+                                        <Modal.Footer>
+                                          <Button
+                                            variant="secondary"
+                                            onClick={() => {
+                                              handleClose();
+                                            }}
+                                          >
+                                            Cancel
+                                          </Button>
+                                          <Button
+                                            variant="primary"
+                                            onClick={() => {
+                                              handleClose();
+                                              handleUpdateComment(comment._id);
+                                            }}
+                                          >
+                                            Save Changes
+                                          </Button>
+                                        </Modal.Footer>
+                                      </Modal>
+                                    </>
                                   </div>
                                 )}
                                 {comment?.commenter._id === userId && (
