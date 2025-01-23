@@ -39,7 +39,7 @@ const Dashboard = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, [userId, posts, comment, commenter]);
+  }, [userId, posts, comment, commenter, avatar]);
 
   const handleAddPost = () => {
     axios
@@ -288,7 +288,10 @@ const Dashboard = () => {
                   <div className="avatar-section">
                     <button
                       className="btn btn-primary mb-3"
-                      onClick={handleCloudinaryUploadAvatar}
+                      onClick={() => {
+                        handleCloudinaryUploadAvatar();
+                        setAvatar(null);
+                      }}
                     >
                       <i className="bi bi-upload"></i> Upload Avatar
                     </button>
@@ -680,7 +683,7 @@ const Dashboard = () => {
                         >
                           Add comment
                         </Button>
-
+                        {console.log("likes", post.likes)}
                         <button
                           className={`btn ${
                             post.likes?.some((like) => like.userId === userId)

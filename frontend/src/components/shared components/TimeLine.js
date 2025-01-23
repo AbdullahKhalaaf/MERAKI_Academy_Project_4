@@ -356,7 +356,7 @@ const TimeLine = () => {
 
       {posts?.length > 0 ? (
         posts.map((post, index) => (
-          <Card key={index} className="mb-4 shadow-sm">
+          <Card key={index} >
             <Card.Body>
               <div className="d-flex align-items-center mb-3">
                 <img
@@ -436,7 +436,6 @@ const TimeLine = () => {
                           </Modal.Footer>
                         </Modal>
                       </>
-                      
                     </div>
                   </>
                 )}
@@ -461,15 +460,10 @@ const TimeLine = () => {
                       src={image}
                       alt={`Post Image ${index + 1}`}
                       className="img-fluid mb-2"
-                      style={{
-                        maxHeight: "200px",
-                        width: "100%",
-                        objectFit: "cover",
-                      }}
                     />
                   ))
                 ) : (
-                  <small>No images</small>
+                  <small></small>
                 )}
               </div>
             </Card.Body>

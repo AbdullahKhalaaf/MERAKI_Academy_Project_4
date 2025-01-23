@@ -324,7 +324,7 @@ const DashboardAnotherUser = () => {
                         {post.author._id === userId && (
                           <>
                             <div
-                              className="post-edit-section"
+                             className="d-flex align-items-center mb-3"
                               style={{
                                 marginLeft: "auto",
                                 display: "flex",
