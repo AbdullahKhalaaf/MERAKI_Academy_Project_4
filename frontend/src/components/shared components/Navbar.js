@@ -1,6 +1,9 @@
 import React, { useContext } from "react";
-import { Navbar, Nav, Container } from "react-bootstrap";
+import Container from "react-bootstrap/Container";
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
 import { userContext } from "../../App";
+import "./Navbar.css";
 
 const NavbarComponent = () => {
   const { token, setToken } = useContext(userContext);
@@ -11,16 +14,24 @@ const NavbarComponent = () => {
   };
 
   return (
-    <Navbar bg="light" expand="lg" fixed="top" className="shadow">
+    <Navbar
+      bg="primary"
+      variant="primary"
+      expand="lg"
+      fixed="top"
+      className="shadow"
+    >
       <Container>
-        <Navbar.Brand href="/">HOS</Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
+        <Navbar.Brand className="name" href="/timeline">
+          Connectify
+        </Navbar.Brand>
+        <Navbar.Toggle aria-controls="navbar-nav" />
+        <Navbar.Collapse id="navbar-nav">
           <Nav className="ms-auto">
             {token ? (
               <>
-                <Nav.Link href="/dashboard">Profile</Nav.Link>
                 <Nav.Link href="/timeline">Home</Nav.Link>
+                <Nav.Link href="/dashboard">Profile</Nav.Link>
                 <Nav.Link href="/" onClick={handleLogOut}>
                   Logout
                 </Nav.Link>

@@ -1,0 +1,16 @@
+.navbar-nav .nav-link {
+    color: white !important; 
+    padding: 8px 16px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    
+  }
+  
+  .navbar-nav .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .name {
+    color: wheat;
+  }
+  

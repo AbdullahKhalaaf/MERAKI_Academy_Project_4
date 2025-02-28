@@ -1,24 +1,24 @@
-import React, { useState, useContext } from 'react';
-import { userContext } from '../../App';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css'; 
+import React, { useState, useContext } from "react";
+import { userContext } from "../../App";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const Login = () => {
   const { setToken } = useContext(userContext);
   const navigate = useNavigate();
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [userInfo, setUserInfo] = useState({});
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const handleLogin = () => {
     axios
-      .post('http://localhost:5000/users/login', userInfo)
+      .post("http://localhost:5000/users/login", userInfo)
       .then((result) => {
         console.log(result);
-        localStorage.setItem('token', result.data.token);
+        localStorage.setItem("token", result.data.token);
         setToken(result.data.token);
-        navigate('/timeline');
+        navigate("/timeline");
         setMessage(result.data.message);
         setIsLoggedIn(true);
       })
@@ -31,7 +31,7 @@ const Login = () => {
   return (
     <div
       className="d-flex vh-100 justify-content-center align-items-center"
-      style={{ paddingTop: "70px" }} // Adjust for navbar height if needed
+      style={{ paddingTop: "70px" }}
     >
       <div className="w-50 p-4 shadow-lg rounded bg-light">
         <h2 className="text-center mb-4">Login</h2>
