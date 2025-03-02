@@ -29,7 +29,7 @@ const TimeLine = () => {
 
   useEffect(() => {
     axios
-      .get("https://connectify-x3ip.onrender.com/posts")
+      .get("`http://localhost:5000/posts")
       .then((result) => {
         setPosts(result.data.posts);
         console.log("result:", result);
@@ -56,7 +56,7 @@ const TimeLine = () => {
 
   const handleUpdateComment = (commenId, postId) => {
     axios
-      .put(`https://connectify-x3ip.onrender.com/comments/update/${commenId}`, {
+      .put(``http://localhost:5000/comments/update/${commenId}`, {
         comment: newComment,
       })
       .then((response) => {
@@ -69,7 +69,7 @@ const TimeLine = () => {
 
   const handleUpdatePost = (postId) => {
     axios
-      .put(`https://connectify-x3ip.onrender.com/posts/${postId}/update`, {
+      .put(``http://localhost:5000/posts/${postId}/update`, {
         content: editPostContent,
       })
       .then((response) => {
@@ -82,7 +82,7 @@ const TimeLine = () => {
 
   const handleDeletePost = (postId) => {
     axios
-      .delete(`https://connectify-x3ip.onrender.com/posts/deletePost/${postId}`)
+      .delete(``http://localhost:5000/posts/deletePost/${postId}`)
       .then((response) => {
         console.log("post Deleted", response);
         setPosts((prevPosts) => {
@@ -96,7 +96,7 @@ const TimeLine = () => {
 
   const handleDeleteComment = (commentId, postId) => {
     axios
-      .delete(`https://connectify-x3ip.onrender.com/comments/${commentId}`)
+      .delete(``http://localhost:5000/comments/${commentId}`)
       .then((response) => {
         console.log("comment Deleted Successfuly:", response);
         setPosts((prevPosts) =>
@@ -121,7 +121,7 @@ const TimeLine = () => {
   const handleAddPost = () => {
     axios
       .post(
-        "https://connectify-x3ip.onrender.com/posts/create",
+        "`http://localhost:5000/posts/create",
         {
           content: newPostContent,
           author: userId,
@@ -184,7 +184,7 @@ const TimeLine = () => {
   const handleAddComment = (postId) => {
     axios
       .post(
-        `https://connectify-x3ip.onrender.com/comments/${postId}/addComment`,
+        ``http://localhost:5000/comments/${postId}/addComment`,
         {
           postId,
           commenter,
@@ -209,7 +209,7 @@ const TimeLine = () => {
 
   const handleLike = (postId) => {
     axios
-      .post(`https://connectify-x3ip.onrender.com/likes/${postId}/newLike`, {
+      .post(``http://localhost:5000/likes/${postId}/newLike`, {
         postId,
         userId,
       })
@@ -231,7 +231,7 @@ const TimeLine = () => {
   const handleUnlike = (postId) => {
     axios
       .delete(
-        `https://connectify-x3ip.onrender.com/likes/deleteLike/${postId}`,
+        ``http://localhost:5000/likes/deleteLike/${postId}`,
         { headers: { Authorization: `Bearer ${token}` } },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -258,7 +258,7 @@ const TimeLine = () => {
   const handleFollowUser = (followedUserId) => {
     axios
       .post(
-        "https://connectify-x3ip.onrender.com/users/follow",
+        "`http://localhost:5000/users/follow",
         { followedUser: followedUserId },
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -273,7 +273,7 @@ const TimeLine = () => {
   const handleUnfollowUser = (followedUserId) => {
     axios
       .post(
-        "https://connectify-x3ip.onrender.com/users/unfollow",
+        "`http://localhost:5000/users/unfollow",
         { followedUser: followedUserId },
         { headers: { Authorization: `Bearer ${token}` } }
       )

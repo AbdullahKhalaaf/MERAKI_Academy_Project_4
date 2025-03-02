@@ -26,7 +26,7 @@ const DashboardAnotherUser = () => {
 
   useEffect(() => {
     axios
-      .get(`https://connectify-x3ip.onrender.com/users/${id}`)
+      .get(``http://localhost:5000/users/${id}`)
       .then((response) => {
         setUser(response.data.user);
         setIsFollowed(
@@ -35,7 +35,7 @@ const DashboardAnotherUser = () => {
           )
         );
         return axios.get(
-          `https://connectify-x3ip.onrender.com/posts/user/${id}`
+          ``http://localhost:5000/posts/user/${id}`
         );
       })
       .then((response) => {
@@ -47,7 +47,7 @@ const DashboardAnotherUser = () => {
   }, [id, userId, posts, comment]);
   const handleUpdateComment = (commenId, postId) => {
     axios
-      .put(`https://connectify-x3ip.onrender.com/comments/update/${commenId}`, {
+      .put(``http://localhost:5000/comments/update/${commenId}`, {
         comment: newComment,
       })
       .then((response) => {
@@ -60,7 +60,7 @@ const DashboardAnotherUser = () => {
 
   const handleUpdatePost = (postId) => {
     axios
-      .put(`https://connectify-x3ip.onrender.com/posts/${postId}/update`, {
+      .put(``http://localhost:5000/posts/${postId}/update`, {
         content: editPostContent,
       })
       .then((response) => {
@@ -76,7 +76,7 @@ const DashboardAnotherUser = () => {
   };
   const handleDeleteComment = (commentId, postId) => {
     axios
-      .delete(`https://connectify-x3ip.onrender.com/comments/${commentId}`)
+      .delete(``http://localhost:5000/comments/${commentId}`)
       .then((response) => {
         console.log("comment Deleted Successfuly:", response);
         setPosts((prevPosts) =>
@@ -101,14 +101,14 @@ const DashboardAnotherUser = () => {
   const handleFollowUser = () => {
     axios
       .post(
-        "https://connectify-x3ip.onrender.com/users/follow",
+        "`http://localhost:5000/users/follow",
         { followedUser: id },
         { headers: { Authorization: `Bearer ${token}` } }
       )
       .then((response) => {
         setIsFollowed(true);
         axios
-          .get(`https://connectify-x3ip.onrender.com/users/${id}`)
+          .get(``http://localhost:5000/users/${id}`)
           .then((updatedResponse) => {
             setUser(updatedResponse.data.user);
           })
@@ -124,14 +124,14 @@ const DashboardAnotherUser = () => {
   const handleUnfollowUser = () => {
     axios
       .post(
-        "https://connectify-x3ip.onrender.com/users/unfollow",
+        "`http://localhost:5000/users/unfollow",
         { followedUser: id },
         { headers: { Authorization: `Bearer ${token}` } }
       )
       .then((response) => {
         setIsFollowed(false);
         axios
-          .get(`https://connectify-x3ip.onrender.com/users/${id}`)
+          .get(``http://localhost:5000/users/${id}`)
           .then((updatedResponse) => {
             setUser(updatedResponse.data.user);
           })
@@ -145,7 +145,7 @@ const DashboardAnotherUser = () => {
   };
   const handleDeletePost = (postId) => {
     axios
-      .delete(`https://connectify-x3ip.onrender.com/posts/deletePost/${postId}`)
+      .delete(``http://localhost:5000/posts/deletePost/${postId}`)
       .then((response) => {
         console.log("post Deleted", response);
         setPosts((prevPosts) => {
@@ -160,7 +160,7 @@ const DashboardAnotherUser = () => {
   const handleAddComment = (postId) => {
     axios
       .post(
-        `https://connectify-x3ip.onrender.com/comments/${postId}/addComment`,
+        ``http://localhost:5000/comments/${postId}/addComment`,
         {
           postId,
           commenter: userId,
@@ -184,7 +184,7 @@ const DashboardAnotherUser = () => {
 
   const handleLike = (postId) => {
     axios
-      .post(`https://connectify-x3ip.onrender.com/likes/${postId}/newLike`, {
+      .post(``http://localhost:5000/likes/${postId}/newLike`, {
         postId,
         userId,
       })
@@ -205,7 +205,7 @@ const DashboardAnotherUser = () => {
   const handleUnlike = (postId) => {
     axios
       .delete(
-        `https://connectify-x3ip.onrender.com/likes/deleteLike/${postId}`,
+        ``http://localhost:5000/likes/deleteLike/${postId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
           data: { postId, userId },

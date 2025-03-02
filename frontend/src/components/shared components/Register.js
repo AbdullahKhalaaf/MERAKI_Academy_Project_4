@@ -11,7 +11,7 @@ const Register = () => {
 
   const handleRegister = () => {
     axios
-      .post("https://connectify-x3ip.onrender.com/users/register", {
+      .post("`http://localhost:5000/users/register", {
         email,
         password,
         userName,

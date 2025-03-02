@@ -28,11 +28,11 @@ const Dashboard = () => {
 
   useEffect(() => {
     axios
-      .get(`https://connectify-x3ip.onrender.com/users/${userId}`)
+      .get(``http://localhost:5000/users/${userId}`)
       .then((response) => {
         setUser(response.data.user);
         return axios.get(
-          `https://connectify-x3ip.onrender.com/posts/user/${userId}`
+          ``http://localhost:5000/posts/user/${userId}`
         );
       })
       .then((response) => {
@@ -46,7 +46,7 @@ const Dashboard = () => {
   const handleAddPost = () => {
     axios
       .post(
-        "https://connectify-x3ip.onrender.com/posts/create",
+        "`http://localhost:5000/posts/create",
         {
           content: newPostContent,
           author: userId,
@@ -137,7 +137,7 @@ const Dashboard = () => {
     if (avatar) {
       axios
         .put(
-          `https://connectify-x3ip.onrender.com/users/updateavatar/${userId}`,
+          ``http://localhost:5000/users/updateavatar/${userId}`,
           {
             avatar: avatar,
           }
@@ -152,7 +152,7 @@ const Dashboard = () => {
   };
   const handleDeleteComment = (commentId, postId) => {
     axios
-      .delete(`https://connectify-x3ip.onrender.com/comments/${commentId}`)
+      .delete(``http://localhost:5000/comments/${commentId}`)
       .then((response) => {
         console.log("comment Deleted Successfuly:", response);
         setPosts((prevPosts) =>
@@ -177,7 +177,7 @@ const Dashboard = () => {
   const handleAddComment = (postId) => {
     axios
       .post(
-        `https://connectify-x3ip.onrender.com/comments/${postId}/addComment`,
+        ``http://localhost:5000/comments/${postId}/addComment`,
         {
           postId,
           commenter: userId,
@@ -200,7 +200,7 @@ const Dashboard = () => {
   };
   const handleLike = (postId) => {
     axios
-      .post(`https://connectify-x3ip.onrender.com/likes/${postId}/newLike`, {
+      .post(``http://localhost:5000/likes/${postId}/newLike`, {
         postId,
         userId,
       })
@@ -219,7 +219,7 @@ const Dashboard = () => {
   };
   const handleDeletePost = (postId) => {
     axios
-      .delete(`https://connectify-x3ip.onrender.com/posts/deletePost/${postId}`)
+      .delete(``http://localhost:5000/posts/deletePost/${postId}`)
       .then((response) => {
         console.log("post Deleted", response);
         setPosts((prevPosts) => {
@@ -233,7 +233,7 @@ const Dashboard = () => {
 
   const handleUpdateComment = (commenId, postId) => {
     axios
-      .put(`https://connectify-x3ip.onrender.com/comments/update/${commenId}`, {
+      .put(``http://localhost:5000/comments/update/${commenId}`, {
         comment: newComment,
       })
       .then((response) => {
@@ -246,7 +246,7 @@ const Dashboard = () => {
 
   const handleUpdatePost = (postId) => {
     axios
-      .put(`https://connectify-x3ip.onrender.com/posts/${postId}/update`, {
+      .put(``http://localhost:5000/posts/${postId}/update`, {
         content: editPostContent,
       })
       .then((response) => {
@@ -260,7 +260,7 @@ const Dashboard = () => {
   const handleUnlike = (postId) => {
     axios
       .delete(
-        `https://connectify-x3ip.onrender.com/likes/deleteLike/${postId}`,
+        ``http://localhost:5000/likes/deleteLike/${postId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
           data: { postId, userId },
