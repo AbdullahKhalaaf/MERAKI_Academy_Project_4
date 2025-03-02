@@ -28,11 +28,11 @@ const Dashboard = () => {
 
   useEffect(() => {
     axios
-      .get(``http://localhost:5000/users/${userId}`)
+      .get(`https://connectifyy-j4fb.onrender.com/users/${userId}`)
       .then((response) => {
         setUser(response.data.user);
         return axios.get(
-          ``http://localhost:5000/posts/user/${userId}`
+          `https://connectifyy-j4fb.onrender.com/posts/user/${userId}`
         );
       })
       .then((response) => {
@@ -46,7 +46,7 @@ const Dashboard = () => {
   const handleAddPost = () => {
     axios
       .post(
-        "`http://localhost:5000/posts/create",
+        "https://connectifyy-j4fb.onrender.com/posts/create",
         {
           content: newPostContent,
           author: userId,
@@ -137,7 +137,7 @@ const Dashboard = () => {
     if (avatar) {
       axios
         .put(
-          ``http://localhost:5000/users/updateavatar/${userId}`,
+          `https://connectifyy-j4fb.onrender.com/users/updateavatar/${userId}`,
           {
             avatar: avatar,
           }
@@ -152,7 +152,7 @@ const Dashboard = () => {
   };
   const handleDeleteComment = (commentId, postId) => {
     axios
-      .delete(``http://localhost:5000/comments/${commentId}`)
+      .delete(`https://connectifyy-j4fb.onrender.com/comments/${commentId}`)
       .then((response) => {
         console.log("comment Deleted Successfuly:", response);
         setPosts((prevPosts) =>
@@ -177,7 +177,7 @@ const Dashboard = () => {
   const handleAddComment = (postId) => {
     axios
       .post(
-        ``http://localhost:5000/comments/${postId}/addComment`,
+        `https://connectifyy-j4fb.onrender.com/comments/${postId}/addComment`,
         {
           postId,
           commenter: userId,
@@ -200,7 +200,7 @@ const Dashboard = () => {
   };
   const handleLike = (postId) => {
     axios
-      .post(``http://localhost:5000/likes/${postId}/newLike`, {
+      .post(`https://connectifyy-j4fb.onrender.com/likes/${postId}/newLike`, {
         postId,
         userId,
       })
@@ -219,7 +219,9 @@ const Dashboard = () => {
   };
   const handleDeletePost = (postId) => {
     axios
-      .delete(``http://localhost:5000/posts/deletePost/${postId}`)
+      .delete(
+        `https://connectifyy-j4fb.onrender.com/posts/deletePost/${postId}`
+      )
       .then((response) => {
         console.log("post Deleted", response);
         setPosts((prevPosts) => {
@@ -233,9 +235,12 @@ const Dashboard = () => {
 
   const handleUpdateComment = (commenId, postId) => {
     axios
-      .put(``http://localhost:5000/comments/update/${commenId}`, {
-        comment: newComment,
-      })
+      .put(
+        `https://connectifyy-j4fb.onrender.com/comments/update/${commenId}`,
+        {
+          comment: newComment,
+        }
+      )
       .then((response) => {
         console.log(response);
       })
@@ -246,7 +251,7 @@ const Dashboard = () => {
 
   const handleUpdatePost = (postId) => {
     axios
-      .put(``http://localhost:5000/posts/${postId}/update`, {
+      .put(`https://connectifyy-j4fb.onrender.com/posts/${postId}/update`, {
         content: editPostContent,
       })
       .then((response) => {
@@ -260,7 +265,7 @@ const Dashboard = () => {
   const handleUnlike = (postId) => {
     axios
       .delete(
-        ``http://localhost:5000/likes/deleteLike/${postId}`,
+        `https://connectifyy-j4fb.onrender.com/likes/deleteLike/${postId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
           data: { postId, userId },

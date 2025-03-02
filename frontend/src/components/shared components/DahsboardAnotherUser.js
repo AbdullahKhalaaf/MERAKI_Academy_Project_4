@@ -26,7 +26,7 @@ const DashboardAnotherUser = () => {
 
   useEffect(() => {
     axios
-      .get(``http://localhost:5000/users/${id}`)
+      .get(`https://connectifyy-j4fb.onrender.com/users/${id}`)
       .then((response) => {
         setUser(response.data.user);
         setIsFollowed(
@@ -35,7 +35,7 @@ const DashboardAnotherUser = () => {
           )
         );
         return axios.get(
-          ``http://localhost:5000/posts/user/${id}`
+          `https://connectifyy-j4fb.onrender.com/posts/user/${id}`
         );
       })
       .then((response) => {
@@ -47,9 +47,12 @@ const DashboardAnotherUser = () => {
   }, [id, userId, posts, comment]);
   const handleUpdateComment = (commenId, postId) => {
     axios
-      .put(``http://localhost:5000/comments/update/${commenId}`, {
-        comment: newComment,
-      })
+      .put(
+        `https://connectifyy-j4fb.onrender.com/comments/update/${commenId}`,
+        {
+          comment: newComment,
+        }
+      )
       .then((response) => {
         console.log(response);
       })
@@ -60,7 +63,7 @@ const DashboardAnotherUser = () => {
 
   const handleUpdatePost = (postId) => {
     axios
-      .put(``http://localhost:5000/posts/${postId}/update`, {
+      .put(`https://connectifyy-j4fb.onrender.com/posts/${postId}/update`, {
         content: editPostContent,
       })
       .then((response) => {
@@ -76,7 +79,7 @@ const DashboardAnotherUser = () => {
   };
   const handleDeleteComment = (commentId, postId) => {
     axios
-      .delete(``http://localhost:5000/comments/${commentId}`)
+      .delete(`https://connectifyy-j4fb.onrender.com/comments/${commentId}`)
       .then((response) => {
         console.log("comment Deleted Successfuly:", response);
         setPosts((prevPosts) =>
@@ -101,14 +104,14 @@ const DashboardAnotherUser = () => {
   const handleFollowUser = () => {
     axios
       .post(
-        "`http://localhost:5000/users/follow",
+        "https://connectifyy-j4fb.onrender.com/users/follow",
         { followedUser: id },
         { headers: { Authorization: `Bearer ${token}` } }
       )
       .then((response) => {
         setIsFollowed(true);
         axios
-          .get(``http://localhost:5000/users/${id}`)
+          .get(`https://connectifyy-j4fb.onrender.com/users/${id}`)
           .then((updatedResponse) => {
             setUser(updatedResponse.data.user);
           })
@@ -124,14 +127,14 @@ const DashboardAnotherUser = () => {
   const handleUnfollowUser = () => {
     axios
       .post(
-        "`http://localhost:5000/users/unfollow",
+        "https://connectifyy-j4fb.onrender.com/users/unfollow",
         { followedUser: id },
         { headers: { Authorization: `Bearer ${token}` } }
       )
       .then((response) => {
         setIsFollowed(false);
         axios
-          .get(``http://localhost:5000/users/${id}`)
+          .get(`https://connectifyy-j4fb.onrender.com/users/${id}`)
           .then((updatedResponse) => {
             setUser(updatedResponse.data.user);
           })
@@ -145,7 +148,9 @@ const DashboardAnotherUser = () => {
   };
   const handleDeletePost = (postId) => {
     axios
-      .delete(``http://localhost:5000/posts/deletePost/${postId}`)
+      .delete(
+        `https://connectifyy-j4fb.onrender.com/posts/deletePost/${postId}`
+      )
       .then((response) => {
         console.log("post Deleted", response);
         setPosts((prevPosts) => {
@@ -160,7 +165,7 @@ const DashboardAnotherUser = () => {
   const handleAddComment = (postId) => {
     axios
       .post(
-        ``http://localhost:5000/comments/${postId}/addComment`,
+        `https://connectifyy-j4fb.onrender.com/comments/${postId}/addComment`,
         {
           postId,
           commenter: userId,
@@ -184,7 +189,7 @@ const DashboardAnotherUser = () => {
 
   const handleLike = (postId) => {
     axios
-      .post(``http://localhost:5000/likes/${postId}/newLike`, {
+      .post(`https://connectifyy-j4fb.onrender.com/likes/${postId}/newLike`, {
         postId,
         userId,
       })
@@ -205,7 +210,7 @@ const DashboardAnotherUser = () => {
   const handleUnlike = (postId) => {
     axios
       .delete(
-        ``http://localhost:5000/likes/deleteLike/${postId}`,
+        `https://connectifyy-j4fb.onrender.com/likes/deleteLike/${postId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
           data: { postId, userId },

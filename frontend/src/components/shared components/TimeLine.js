@@ -29,7 +29,7 @@ const TimeLine = () => {
 
   useEffect(() => {
     axios
-      .get("`http://localhost:5000/posts")
+      .get("https://connectifyy-j4fb.onrender.com/posts")
       .then((result) => {
         setPosts(result.data.posts);
         console.log("result:", result);
@@ -56,9 +56,12 @@ const TimeLine = () => {
 
   const handleUpdateComment = (commenId, postId) => {
     axios
-      .put(``http://localhost:5000/comments/update/${commenId}`, {
-        comment: newComment,
-      })
+      .put(
+        `https://connectifyy-j4fb.onrender.com/comments/update/${commenId}`,
+        {
+          comment: newComment,
+        }
+      )
       .then((response) => {
         console.log(response);
       })
@@ -69,7 +72,7 @@ const TimeLine = () => {
 
   const handleUpdatePost = (postId) => {
     axios
-      .put(``http://localhost:5000/posts/${postId}/update`, {
+      .put(`https://connectifyy-j4fb.onrender.com/posts/${postId}/update`, {
         content: editPostContent,
       })
       .then((response) => {
@@ -82,7 +85,9 @@ const TimeLine = () => {
 
   const handleDeletePost = (postId) => {
     axios
-      .delete(``http://localhost:5000/posts/deletePost/${postId}`)
+      .delete(
+        `https://connectifyy-j4fb.onrender.com/posts/deletePost/${postId}`
+      )
       .then((response) => {
         console.log("post Deleted", response);
         setPosts((prevPosts) => {
@@ -96,7 +101,7 @@ const TimeLine = () => {
 
   const handleDeleteComment = (commentId, postId) => {
     axios
-      .delete(``http://localhost:5000/comments/${commentId}`)
+      .delete(`https://connectifyy-j4fb.onrender.com/comments/${commentId}`)
       .then((response) => {
         console.log("comment Deleted Successfuly:", response);
         setPosts((prevPosts) =>
@@ -121,7 +126,7 @@ const TimeLine = () => {
   const handleAddPost = () => {
     axios
       .post(
-        "`http://localhost:5000/posts/create",
+        "https://connectifyy-j4fb.onrender.com/posts/create",
         {
           content: newPostContent,
           author: userId,
@@ -184,7 +189,7 @@ const TimeLine = () => {
   const handleAddComment = (postId) => {
     axios
       .post(
-        ``http://localhost:5000/comments/${postId}/addComment`,
+        `https://connectifyy-j4fb.onrender.com/comments/${postId}/addComment`,
         {
           postId,
           commenter,
@@ -209,7 +214,7 @@ const TimeLine = () => {
 
   const handleLike = (postId) => {
     axios
-      .post(``http://localhost:5000/likes/${postId}/newLike`, {
+      .post(`https://connectifyy-j4fb.onrender.com/likes/${postId}/newLike`, {
         postId,
         userId,
       })
@@ -231,7 +236,7 @@ const TimeLine = () => {
   const handleUnlike = (postId) => {
     axios
       .delete(
-        ``http://localhost:5000/likes/deleteLike/${postId}`,
+        `https://connectifyy-j4fb.onrender.com/likes/deleteLike/${postId}`,
         { headers: { Authorization: `Bearer ${token}` } },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -258,7 +263,7 @@ const TimeLine = () => {
   const handleFollowUser = (followedUserId) => {
     axios
       .post(
-        "`http://localhost:5000/users/follow",
+        "https://connectifyy-j4fb.onrender.com/users/follow",
         { followedUser: followedUserId },
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -273,7 +278,7 @@ const TimeLine = () => {
   const handleUnfollowUser = (followedUserId) => {
     axios
       .post(
-        "`http://localhost:5000/users/unfollow",
+        "https://connectifyy-j4fb.onrender.com/users/unfollow",
         { followedUser: followedUserId },
         { headers: { Authorization: `Bearer ${token}` } }
       )

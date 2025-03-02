@@ -13,7 +13,7 @@ const Login = () => {
 
   const handleLogin = () => {
     axios
-      .post("`http://localhost:5000/users/login", userInfo)
+      .post("https://connectifyy-j4fb.onrender.com/users/login", userInfo)
       .then((result) => {
         console.log(result);
         localStorage.setItem("token", result.data.token);
