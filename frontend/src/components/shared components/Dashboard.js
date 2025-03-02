@@ -28,10 +28,12 @@ const Dashboard = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/users/${userId}`)
+      .get(`https://connectify-x3ip.onrender.com/users/${userId}`)
       .then((response) => {
         setUser(response.data.user);
-        return axios.get(`http://localhost:5000/posts/user/${userId}`);
+        return axios.get(
+          `https://connectify-x3ip.onrender.com/posts/user/${userId}`
+        );
       })
       .then((response) => {
         setPosts(response.data.post);
@@ -44,7 +46,7 @@ const Dashboard = () => {
   const handleAddPost = () => {
     axios
       .post(
-        "http://localhost:5000/posts/create",
+        "https://connectify-x3ip.onrender.com/posts/create",
         {
           content: newPostContent,
           author: userId,
@@ -134,9 +136,12 @@ const Dashboard = () => {
   const updateAvatar = () => {
     if (avatar) {
       axios
-        .put(`http://localhost:5000/users/updateavatar/${userId}`, {
-          avatar: avatar,
-        })
+        .put(
+          `https://connectify-x3ip.onrender.com/users/updateavatar/${userId}`,
+          {
+            avatar: avatar,
+          }
+        )
         .then((result) => {
           console.log("Avatar updated successfully:", result.data);
         })
@@ -147,7 +152,7 @@ const Dashboard = () => {
   };
   const handleDeleteComment = (commentId, postId) => {
     axios
-      .delete(`http://localhost:5000/comments/${commentId}`)
+      .delete(`https://connectify-x3ip.onrender.com/comments/${commentId}`)
       .then((response) => {
         console.log("comment Deleted Successfuly:", response);
         setPosts((prevPosts) =>
@@ -171,11 +176,14 @@ const Dashboard = () => {
 
   const handleAddComment = (postId) => {
     axios
-      .post(`http://localhost:5000/comments/${postId}/addComment`, {
-        postId,
-        commenter: userId,
-        comment,
-      })
+      .post(
+        `https://connectify-x3ip.onrender.com/comments/${postId}/addComment`,
+        {
+          postId,
+          commenter: userId,
+          comment,
+        }
+      )
       .then((result) => {
         setComment("");
         setPosts((prevPosts) =>
@@ -192,7 +200,10 @@ const Dashboard = () => {
   };
   const handleLike = (postId) => {
     axios
-      .post(`http://localhost:5000/likes/${postId}/newLike`, { postId, userId })
+      .post(`https://connectify-x3ip.onrender.com/likes/${postId}/newLike`, {
+        postId,
+        userId,
+      })
       .then((response) => {
         setPosts((prevPosts) =>
           prevPosts.map((post) =>
@@ -208,7 +219,7 @@ const Dashboard = () => {
   };
   const handleDeletePost = (postId) => {
     axios
-      .delete(`http://localhost:5000/posts/deletePost/${postId}`)
+      .delete(`https://connectify-x3ip.onrender.com/posts/deletePost/${postId}`)
       .then((response) => {
         console.log("post Deleted", response);
         setPosts((prevPosts) => {
@@ -222,7 +233,7 @@ const Dashboard = () => {
 
   const handleUpdateComment = (commenId, postId) => {
     axios
-      .put(`http://localhost:5000/comments/update/${commenId}`, {
+      .put(`https://connectify-x3ip.onrender.com/comments/update/${commenId}`, {
         comment: newComment,
       })
       .then((response) => {
@@ -235,7 +246,7 @@ const Dashboard = () => {
 
   const handleUpdatePost = (postId) => {
     axios
-      .put(`http://localhost:5000/posts/${postId}/update`, {
+      .put(`https://connectify-x3ip.onrender.com/posts/${postId}/update`, {
         content: editPostContent,
       })
       .then((response) => {
@@ -248,10 +259,13 @@ const Dashboard = () => {
 
   const handleUnlike = (postId) => {
     axios
-      .delete(`http://localhost:5000/likes/deleteLike/${postId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-        data: { postId, userId },
-      })
+      .delete(
+        `https://connectify-x3ip.onrender.com/likes/deleteLike/${postId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          data: { postId, userId },
+        }
+      )
       .then((response) => {
         setPosts((prevPosts) =>
           prevPosts.map((post) =>
